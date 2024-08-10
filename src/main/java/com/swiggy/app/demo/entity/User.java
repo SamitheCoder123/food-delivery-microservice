@@ -1,11 +1,16 @@
 package com.swiggy.app.demo.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 /**
  * @author
  **/
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 @Table(name = "users")
 public class User {
 
@@ -22,5 +27,4 @@ public class User {
     @Column(nullable = false)
     private String email;
 
-    // Getters and Setters
 }
