@@ -3,7 +3,12 @@ package com.swiggy.app.demo;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
+/**
+ * @author : Samiullah Makandar
+ * @purpose :
+ */
+
+@SpringBootApplication(scanBasePackages = {"com.swiggy.app.demo"})
 public class UserServiceApplicationApplication {
 
 	public static void main(String[] args) {
