@@ -20,7 +20,7 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<OrderDto> createOrder(@RequestBody OrderDto orderDTO) {
         OrderDto createdOrder = orderService.createOrder(orderDTO);
         return new ResponseEntity<>(createdOrder, HttpStatus.CREATED);

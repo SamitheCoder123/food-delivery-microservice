@@ -1,5 +1,6 @@
 package com.swiggy.app.demo.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.swiggy.app.demo.Dto.OrderDto;
 import com.swiggy.app.demo.Exception.ResourceNotFoundException;
 import com.swiggy.app.demo.entity.Order;
@@ -8,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,49 +20,72 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private OrderRepo orderRepository;  // Use the correct instance variable name here
 
+    @Autowired
+    private ObjectMapper objectMapper; // Inject ObjectMapper
+
     @Override
     public OrderDto createOrder(OrderDto orderDTO) {
-        Order order = convertToEntity(orderDTO);
-        order = orderRepository.save(order);  // Use the instance variable here
-        return convertToDTO(order);
+        if (orderDTO == null) {
+            throw new IllegalArgumentException("OrderDto cannot be null");
+        }
+
+        // Convert DTO to entity
+        Order order = objectMapper.convertValue(orderDTO, Order.class);
+
+        // Set additional fields if necessary
+        order.setCreatedAt(LocalDateTime.now());
+        order.setUpdatedAt(LocalDateTime.now());
+
+        // Save the order entity
+        order = orderRepository.save(order);
+
+        // Convert entity back to DTO
+        return objectMapper.convertValue(order, OrderDto.class);
     }
 
     @Override
     public OrderDto getOrderById(Long id) {
-        Order order = orderRepository.findById(id)  // Use the instance variable here
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + id));
-        return convertToDTO(order);
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+        return objectMapper.convertValue(order, OrderDto.class);
     }
 
     @Override
     public List<OrderDto> getAllOrders() {
-        List<Order> orders = orderRepository.findAll();  // Use the instance variable here
-        return orders.stream().map(this::convertToDTO).collect(Collectors.toList());
+        List<Order> orders = orderRepository.findAll();
+        return orders.stream()
+                .map(order -> objectMapper.convertValue(order, OrderDto.class))
+                .collect(Collectors.toList());
     }
 
     @Override
     public OrderDto updateOrder(Long id, OrderDto orderDTO) {
-        Order order = orderRepository.findById(id)  // Use the instance variable here
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + id));
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+
+        // Update order fields from DTO
         order.setTotalAmount(orderDTO.getTotalAmount());
         order.setStatus(orderDTO.getStatus());
-        order.setUpdatedAt(orderDTO.getUpdatedAt());
-        order = orderRepository.save(order);  // Use the instance variable here
-        return convertToDTO(order);
+        order.setUpdatedAt(LocalDateTime.now());
+
+        // Save updated order
+        order = orderRepository.save(order);
+
+        return objectMapper.convertValue(order, OrderDto.class);
     }
 
     @Override
     public void deleteOrder(Long id) {
-        Order order = orderRepository.findById(id)  // Use the instance variable here
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + id));
-        orderRepository.delete(order);  // Use the instance variable here
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+        orderRepository.delete(order);
     }
-
-    private Order convertToEntity(OrderDto orderDTO) {
-        return new Order(orderDTO.getUserId(), orderDTO.getTotalAmount(), orderDTO.getStatus());
-    }
-
-    private OrderDto convertToDTO(Order order) {
-        return new OrderDto(order.getId(), order.getUserId(), order.getTotalAmount(), order.getStatus(), order.getCreatedAt(), order.getUpdatedAt());
-    }
+//
+//    private Order convertToEntity(OrderDto orderDTO) {
+//        return new Order(orderDTO.getUserId(), orderDTO.getTotalAmount(), orderDTO.getStatus(), orderDTO.getCreatedAt(), orderDTO.getUpdatedAt());
+//    }
+//
+//    private OrderDto convertToDTO(Order order) {
+//        return new OrderDto(order.getId(), order.getUserId(), order.getTotalAmount(), order.getStatus(), order.getCreatedAt(), order.getUpdatedAt());
+//    }
 }
