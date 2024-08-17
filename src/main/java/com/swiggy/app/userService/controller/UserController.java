@@ -1,7 +1,7 @@
-package com.swiggy.app.demo.controller;
+package com.swiggy.app.userService.controller;
 
-import com.swiggy.app.demo.entity.User;
-import com.swiggy.app.demo.service.UserService;
+import com.swiggy.app.userService.entity.User;
+import com.swiggy.app.userService.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

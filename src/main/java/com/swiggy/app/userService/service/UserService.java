@@ -1,7 +1,6 @@
-package com.swiggy.app.demo.service;
+package com.swiggy.app.userService.service;
 
-import com.swiggy.app.demo.entity.User;
-import org.springframework.stereotype.Service;
+import com.swiggy.app.userService.entity.User;
 
 /**
  * @author : Samiullah Makandar

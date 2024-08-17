@@ -1,4 +1,4 @@
-package com.swiggy.app.demo.entity;
+package com.swiggy.app.userService.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;

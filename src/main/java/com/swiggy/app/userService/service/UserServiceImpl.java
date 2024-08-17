@@ -1,7 +1,7 @@
-package com.swiggy.app.demo.service;
+package com.swiggy.app.userService.service;
 
-import com.swiggy.app.demo.entity.User;
-import com.swiggy.app.demo.repository.UserRepository;
+import com.swiggy.app.userService.entity.User;
+import com.swiggy.app.userService.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

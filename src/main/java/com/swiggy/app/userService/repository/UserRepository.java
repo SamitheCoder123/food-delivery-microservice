@@ -1,10 +1,8 @@
-package com.swiggy.app.demo.repository;
+package com.swiggy.app.userService.repository;
 
-import com.swiggy.app.demo.entity.User;
+import com.swiggy.app.userService.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import java.util.Optional;
 
 /**
  * @author : Samiullah Makandar
