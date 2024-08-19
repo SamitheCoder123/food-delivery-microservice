@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "latitude": 12.9715987,
+    "longitude": 77.5945627,
+    "address": "123 Main St",
+    "city": "Bangalore",
+    "state": "Karnataka",
+    "zipCode": "560001"
+  },
+  {
+    "id": 2,
+    "latitude": 28.6139391,
+    "longitude": 77.2090212,
+    "address": "456 Elm St",
+    "city": "Delhi",
+    "state": "Delhi",
+    "zipCode": "110001"
+  },
+  {
+    "id": 3,
+    "latitude": 19.076090,
+    "longitude": 72.877426,
+    "address": "789 Oak St",
+    "city": "Mumbai",
+    "state": "Maharashtra",
+    "zipCode": "400001"
+  }
+]
