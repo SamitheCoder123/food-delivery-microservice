@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author
@@ -23,14 +25,11 @@ public class Order {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItem> items = new ArrayList<>();
+
     @Column(name = "total_amount", nullable = false)
     private Double totalAmount;
-
-    public Order(Long userId, Double totalAmount, String status) {
-        this.userId = userId;
-        this.totalAmount = totalAmount;
-        this.status = status;
-    }
 
     @Column(name = "status", nullable = false)
     private String status;
@@ -41,17 +40,14 @@ public class Order {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-   @PrePersist
-   protected void onCreate() {
-       createdAt = LocalDateTime.now();
-       updatedAt = LocalDateTime.now();
-   }
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
 
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
-    }
-
-    public Order(Long userId, Double totalAmount, String status, LocalDateTime createdAt, LocalDateTime updatedAt) {
     }
 }

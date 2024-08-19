@@ -1,6 +1,7 @@
 package com.swiggy.app.demo.controller;
 
 import com.swiggy.app.demo.Dto.OrderDto;
+import com.swiggy.app.demo.Exception.ResourceNotFoundException;
 import com.swiggy.app.demo.entity.Order;
 import com.swiggy.app.demo.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +29,12 @@ public class OrderController {
 
     @GetMapping("/{id}")
     public ResponseEntity<OrderDto> getOrderById(@PathVariable Long id) {
-        OrderDto orderDTO = orderService.getOrderById(id);
-        return new ResponseEntity<>(orderDTO, HttpStatus.OK);
+        try {
+            OrderDto orderDTO = orderService.getOrderById(id);
+            return new ResponseEntity<>(orderDTO, HttpStatus.OK);
+        } catch (ResourceNotFoundException ex) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping
@@ -40,15 +45,21 @@ public class OrderController {
 
     @PutMapping("/{id}")
     public ResponseEntity<OrderDto> updateOrder(@PathVariable Long id, @RequestBody OrderDto orderDTO) {
-        OrderDto OrderDto;
-        OrderDto updatedOrder = orderService.updateOrder(id, orderDTO);
-        return new ResponseEntity<>(updatedOrder, HttpStatus.OK);
+        try {
+            OrderDto updatedOrder = orderService.updateOrder(id, orderDTO);
+            return new ResponseEntity<>(updatedOrder, HttpStatus.OK);
+        } catch (ResourceNotFoundException ex) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOrder(@PathVariable Long id) {
-        orderService.deleteOrder(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        try {
+            orderService.deleteOrder(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (ResourceNotFoundException ex) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }
-

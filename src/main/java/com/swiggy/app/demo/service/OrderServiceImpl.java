@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.swiggy.app.demo.Dto.OrderDto;
 import com.swiggy.app.demo.Exception.ResourceNotFoundException;
 import com.swiggy.app.demo.entity.Order;
+import com.swiggy.app.demo.entity.OrderItem;
 import com.swiggy.app.demo.repository.OrderRepo;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,12 @@ public class OrderServiceImpl implements OrderService {
 
         // Convert DTO to entity
         Order order = objectMapper.convertValue(orderDTO, Order.class);
-
+        // Handle OrderItems if necessary
+        if (order.getItems() != null) {
+            for (OrderItem item : order.getItems()) {
+                item.setOrder(order); // Set the order reference in each item
+            }
+        }
         // Set additional fields if necessary
         order.setCreatedAt(LocalDateTime.now());
         order.setUpdatedAt(LocalDateTime.now());
@@ -80,12 +86,5 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
         orderRepository.delete(order);
     }
-//
-//    private Order convertToEntity(OrderDto orderDTO) {
-//        return new Order(orderDTO.getUserId(), orderDTO.getTotalAmount(), orderDTO.getStatus(), orderDTO.getCreatedAt(), orderDTO.getUpdatedAt());
-//    }
-//
-//    private OrderDto convertToDTO(Order order) {
-//        return new OrderDto(order.getId(), order.getUserId(), order.getTotalAmount(), order.getStatus(), order.getCreatedAt(), order.getUpdatedAt());
-//    }
+
 }
