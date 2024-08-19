@@ -10,6 +10,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -33,13 +34,22 @@ public class SecurityConfig {
                 authorizeHttpRequests(request -> request
                         .requestMatchers("login", "register").permitAll()
                         .anyRequest().authenticated()).
-                httpBasic(Customizer.withDefaults()).
+                        //formLogin(Customizer.withDefaults()). // for browser login form
+                        httpBasic(Customizer.withDefaults()).
                 sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
-
-
     }
+        // break-down for customizer.disable().build()
+        /* Customizer<CsrfConfigurer<HttpSecurity>> custCsrf = new Customizer<CsrfConfigurer<HttpSecurity>>() {
+            @Override
+            public void customize(CsrfConfigurer<HttpSecurity> customizer) {
+                customizer.disable();
+            }
+        };
+        http.csrf(custCsrf);
+        return http.build();
+        }*/
 
     @Bean
     public AuthenticationProvider authenticationProvider() {

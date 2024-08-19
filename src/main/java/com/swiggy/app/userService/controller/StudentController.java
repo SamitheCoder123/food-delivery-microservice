@@ -20,7 +20,6 @@ public class StudentController {
                     new Student(2, "Deepa", 2)
             ));
 
-
     @GetMapping("/students")
     public List<Student> getStudents() {
         return students;
@@ -29,15 +28,11 @@ public class StudentController {
     @GetMapping("/csrf-token")
     public CsrfToken getCsrfToken(HttpServletRequest request) {
         return (CsrfToken) request.getAttribute("_csrf");
-
-
     }
-
 
     @PostMapping("/students")
     public Student addStudent(@RequestBody Student student) {
         students.add(student);
         return student;
     }
-
 }
