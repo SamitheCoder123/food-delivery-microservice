@@ -18,6 +18,7 @@ public class TrackingController {
 
     @PostMapping("/orders/{orderId}")
     public ResponseEntity<Void> addTrackingEntry(@PathVariable Long orderId, @RequestBody Tracking tracking) {
+        tracking.setOrderId(orderId);
         trackingService.addTrackingEntry(tracking);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }

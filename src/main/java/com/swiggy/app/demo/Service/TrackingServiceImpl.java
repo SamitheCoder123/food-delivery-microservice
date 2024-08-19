@@ -16,6 +16,7 @@ public class TrackingServiceImpl implements TrackingService {
 
     @Override
     public void addTrackingEntry(Tracking tracking) {
+        // Set the current timestamp when the order is placed
         tracking.setTimestamp(LocalDateTime.now());
         trackingRepository.save(tracking);
     }
