@@ -4,12 +4,14 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * @author
  **/
 @Entity
 @Data
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "food_items")

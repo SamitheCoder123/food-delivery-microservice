@@ -5,6 +5,7 @@ import com.swiggy.app.demo.Dto.MenuDto;
 import com.swiggy.app.demo.Exception.ResourceNotFoundException;
 import com.swiggy.app.demo.entity.Menu;
 import com.swiggy.app.demo.repository.MenuRepo;
+import com.swiggy.app.demo.repository.RestaurantRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,8 @@ public class MenuServiceImpl implements MenuService {
 
     @Autowired
     private MenuRepo menuRepository;
+     @Autowired
+    private RestaurantRepo restaurantRepo;
 
     @Autowired
     private ObjectMapper objectMapper;

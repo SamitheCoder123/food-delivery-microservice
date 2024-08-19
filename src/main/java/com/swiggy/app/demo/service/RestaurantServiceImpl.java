@@ -2,6 +2,8 @@ package com.swiggy.app.demo.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.swiggy.app.demo.Dto.RestaurantDto;
+import com.swiggy.app.demo.entity.FoodItem;
+import com.swiggy.app.demo.entity.Menu;
 import com.swiggy.app.demo.entity.Restaurant;
 import com.swiggy.app.demo.repository.RestaurantRepo;
 import jakarta.transaction.Transactional;
@@ -27,6 +29,19 @@ public class RestaurantServiceImpl implements RestaurantService {
     @Override
     public RestaurantDto createRestaurant(RestaurantDto restaurantDto) {
         Restaurant restaurant = objectMapper.convertValue(restaurantDto, Restaurant.class);
+
+        // Set the bi-directional relationship
+        if (restaurant.getMenus() != null) {
+            for (Menu menu : restaurant.getMenus()) {
+                menu.setRestaurant(restaurant);
+                if (menu.getFoodItems() != null) {
+                    for (FoodItem foodItem : menu.getFoodItems()) {
+                        foodItem.setMenu(menu);
+                    }
+                }
+            }
+        }
+
         restaurant = restaurantRepository.save(restaurant);
         return objectMapper.convertValue(restaurant, RestaurantDto.class);
     }
