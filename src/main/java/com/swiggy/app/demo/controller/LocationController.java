@@ -3,6 +3,7 @@ package com.swiggy.app.demo.controller;
 import com.swiggy.app.demo.entity.Location;
 import com.swiggy.app.demo.service.LocationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,6 +43,16 @@ public class LocationController {
     @DeleteMapping("/{id}")
     public void deleteLocation(@PathVariable Long id) {
         locationService.deleteLocation(id);
+    }
+
+    @GetMapping("/load")
+    public ResponseEntity<String> loadLocationsToDatabase() {
+        try {
+            locationService.loadLocations();
+            return ResponseEntity.ok("Locations loaded successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to load locations: " + e.getMessage());
+        }
     }
 }
 

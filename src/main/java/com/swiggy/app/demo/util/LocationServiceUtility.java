@@ -8,6 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,6 +22,8 @@ import java.sql.SQLException;
 /**
  * @author
  **/
+
+@Component
 public class LocationServiceUtility {
 
     private static final Logger logger = LoggerFactory.getLogger(LocationServiceUtility.class);
@@ -35,7 +38,7 @@ public class LocationServiceUtility {
 
     public static void loadLocationsToDB() {
         try {
-            String jsonString = new String(Files.readAllBytes(Paths.get("resources/locations.json")));
+            String jsonString = new String(Files.readAllBytes(Paths.get("src/main/resources/locations.json")));
 
             JSONArray locationsArray;
             try {
@@ -57,7 +60,7 @@ public class LocationServiceUtility {
                             preparedStatement.setString(4, location.getString("address"));
                             preparedStatement.setString(5, location.getString("city"));
                             preparedStatement.setString(6, location.getString("state"));
-                            preparedStatement.setString(7, location.getString("zip_Code"));
+                            preparedStatement.setString(7, location.getString("zipCode"));
 
                             // Log the query execution
                             logger.debug("Executing query for location id: " + location.getInt("id"));
