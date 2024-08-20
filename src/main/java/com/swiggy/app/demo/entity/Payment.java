@@ -1,7 +1,10 @@
 package com.swiggy.app.demo.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * @author
@@ -11,7 +14,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(name = "users")
+@Table(name = "payments")
 public class Payment {
 
     @Id
@@ -19,12 +22,17 @@ public class Payment {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String username;
+    private String orderId;
 
     @Column(nullable = false)
-    private String password;
+    private double amount;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String email;
+    private PaymentMethod paymentMethod;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private PaymentStatus status;
 
 }
