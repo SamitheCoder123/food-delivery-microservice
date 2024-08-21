@@ -32,11 +32,14 @@ public class SecurityConfig {
 
         return http.csrf(customizer -> customizer.disable()).
                 authorizeHttpRequests(request -> request
-                        .requestMatchers("login", "register").permitAll()
+                        .requestMatchers("/api/login", "/api/register", "/api/logout").permitAll()
                         .anyRequest().authenticated()).
                         //formLogin(Customizer.withDefaults()). // for browser login form
                         httpBasic(Customizer.withDefaults()).
                 sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                        .logout(logout -> logout.logoutUrl("/logout")
+//                        .invalidateHttpSession(true)
+//                        .deleteCookies("JSESSIONID"))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
@@ -53,8 +56,8 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setPasswordEncoder(new BCryptPasswordEncoder(12));
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(); //used to connect with DB
+        provider.setPasswordEncoder(new BCryptPasswordEncoder(12)); //verify the password encoded using BCryptPasswordEncoder with strenght 12
         provider.setUserDetailsService(userDetailsService);
 
 
