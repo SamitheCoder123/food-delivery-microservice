@@ -1,4 +1,4 @@
-package com.swiggy.app.demo.service.impl;
+package com.swiggy.app.demo.service;
 
 import com.swiggy.app.demo.entity.Payment;
 import com.swiggy.app.demo.entity.PaymentMethod;
