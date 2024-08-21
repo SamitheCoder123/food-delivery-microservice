@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-public class StudentController {
+public class CustomerController {
 
     private List<Student> students = new ArrayList<>(
             List.of(

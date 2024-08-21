@@ -1,12 +1,12 @@
 package com.swiggy.app.userService.model;
 
-public class Student {
+public class Customer {
     private int id;
     private String name;
     private int order;
 
 
-    public Student(int id, String name,int order) {
+    public Customer(int id, String name,int order) {
         this.id = id;
         this.name = name;
         this.order = order;
@@ -39,7 +39,7 @@ public class Student {
 
     @Override
     public String toString() {
-        return "StudentController{" +
+        return "CustomerController{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", order=" + order +
