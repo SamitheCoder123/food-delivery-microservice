@@ -1,11 +1,14 @@
-package com.swiggy.app.demo.service;
+package com.swiggy.app.demo.service.impl;
 
 import com.swiggy.app.demo.entity.Payment;
 import com.swiggy.app.demo.entity.PaymentMethod;
 import com.swiggy.app.demo.entity.PaymentStatus;
 import com.swiggy.app.demo.repository.PaymentRepository;
+import com.swiggy.app.demo.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -15,11 +18,12 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public Payment processPayment(String orderId, double amount, PaymentMethod paymentMethod) {
-        Payment payment = new Payment();
-        payment.setOrderId(orderId);
-        payment.setAmount(amount);
-        payment.setPaymentMethod(paymentMethod);
-        payment.setStatus(PaymentStatus.PENDING);
+        Payment payment = Payment.builder()
+                .orderId(orderId)
+                .amount(amount)
+                .paymentMethod(paymentMethod)
+                .status(PaymentStatus.PENDING)
+                .build();
 
         switch (paymentMethod) {
             case COD:
@@ -30,26 +34,44 @@ public class PaymentServiceImpl implements PaymentService {
                 break;
             case CREDIT_CARD:
             case DEBIT_CARD:
-                processCardPayment(payment, paymentMethod);
+                processCardPayment(payment);
                 break;
             default:
-                throw new UnsupportedOperationException("Unsupported payment method");
+                throw new UnsupportedOperationException("Unsupported payment method: " + paymentMethod);
         }
 
         return paymentRepository.save(payment);
     }
 
     @Override
-    public Payment refundPayment(Payment payment) {
-        if (payment.getStatus() == PaymentStatus.COMPLETED) {
-            payment.setStatus(PaymentStatus.PENDING);
-            System.out.println("Refund initiated for payment ID: " + payment.getId());
-            payment.setStatus(PaymentStatus.COMPLETED);
-        } else {
+    public Optional<Payment> getPaymentById(Long id) {
+        return paymentRepository.findById(id);
+    }
+
+    @Override
+    public Payment refundPayment(Long paymentId) {
+        Optional<Payment> paymentOpt = paymentRepository.findById(paymentId);
+        if (paymentOpt.isEmpty()) {
+            throw new IllegalArgumentException("Payment not found with ID: " + paymentId);
+        }
+
+        Payment payment = paymentOpt.get();
+        if (payment.getStatus() != PaymentStatus.COMPLETED) {
             throw new IllegalStateException("Cannot refund payment with status: " + payment.getStatus());
         }
 
-        return paymentRepository.save(payment); // Save the updated payment
+        payment.setStatus(PaymentStatus.PENDING);
+        // Simulate refund processing
+        boolean refundSuccess = simulateRefundTransaction();
+        if (refundSuccess) {
+            payment.setStatus(PaymentStatus.COMPLETED);
+            System.out.println("Refund completed for payment ID: " + paymentId);
+        } else {
+            payment.setStatus(PaymentStatus.FAILED);
+            System.out.println("Refund failed for payment ID: " + paymentId);
+        }
+
+        return paymentRepository.save(payment);
     }
 
     private void processCOD(Payment payment) {
@@ -58,7 +80,8 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private void processUPI(Payment payment) {
-        if (simulateUPITransaction()) {
+        boolean transactionSuccess = simulateUPITransaction();
+        if (transactionSuccess) {
             payment.setStatus(PaymentStatus.COMPLETED);
             System.out.println("Payment completed via UPI.");
         } else {
@@ -67,21 +90,29 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
 
-    private void processCardPayment(Payment payment, PaymentMethod method) {
-        if (simulateCardTransaction()) {
+    private void processCardPayment(Payment payment) {
+        boolean transactionSuccess = simulateCardTransaction();
+        if (transactionSuccess) {
             payment.setStatus(PaymentStatus.COMPLETED);
-            System.out.println("Payment completed via " + method + ".");
+            System.out.println("Payment completed via " + payment.getPaymentMethod() + ".");
         } else {
             payment.setStatus(PaymentStatus.FAILED);
-            System.out.println(method + " payment failed.");
+            System.out.println(payment.getPaymentMethod() + " payment failed.");
         }
     }
 
     private boolean simulateUPITransaction() {
-        return true;
+        // Simulate UPI transaction logic here
+        return true; // For testing purposes, always successful
     }
 
     private boolean simulateCardTransaction() {
-        return true;
+        // Simulate card transaction logic here
+        return true; // For testing purposes, always successful
+    }
+
+    private boolean simulateRefundTransaction() {
+        // Simulate refund transaction logic here
+        return true; // For testing purposes, always successful
     }
 }

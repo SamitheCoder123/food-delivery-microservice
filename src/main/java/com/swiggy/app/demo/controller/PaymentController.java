@@ -1,18 +1,15 @@
 package com.swiggy.app.demo.controller;
 
 import com.swiggy.app.demo.entity.Payment;
-import com.swiggy.app.demo.repository.PaymentRepository;
+import com.swiggy.app.demo.entity.PaymentMethod;
 import com.swiggy.app.demo.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 
 import java.util.Optional;
 
-/**
- * @author
- **/
 @RestController
 @RequestMapping("/api/payments")
 public class PaymentController {
@@ -20,44 +17,43 @@ public class PaymentController {
     @Autowired
     private PaymentService paymentService;
 
-    @Autowired
-    private PaymentRepository paymentRepository;
-
+    // Process Payment
     @PostMapping
     public ResponseEntity<Payment> processPayment(@RequestBody Payment paymentRequest) {
-        Payment payment = paymentService.processPayment(
-                paymentRequest.getOrderId(),
-                paymentRequest.getAmount(),
-                paymentRequest.getPaymentMethod()
-        );
-        paymentRepository.save(payment);
-
-        return new ResponseEntity<>(payment, HttpStatus.CREATED);
+        try {
+            Payment payment = paymentService.processPayment(
+                    paymentRequest.getOrderId(),
+                    paymentRequest.getAmount(),
+                    paymentRequest.getPaymentMethod()
+            );
+            return new ResponseEntity<>(payment, HttpStatus.CREATED);
+        } catch (UnsupportedOperationException e) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-
+    // Get Payment by ID
     @GetMapping("/{id}")
     public ResponseEntity<Payment> getPayment(@PathVariable Long id) {
-        Optional<Payment> payment = paymentRepository.findById(id);
-        if (payment.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(payment.get(), HttpStatus.OK);
+        Optional<Payment> payment = paymentService.getPaymentById(id);
+        return payment.map(ResponseEntity::ok)
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    /*@PutMapping("/{id}/refund")
-    public ResponseEntity<RefundDTO> refundPayment(@PathVariable Long id, @RequestBody RefundDTO refundDTO) {
-        Optional<Payment> paymentOptional = paymentRepository.findById(id);
-        if (paymentOptional.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    // Refund Payment
+    @PostMapping("/{id}/refund")
+    public ResponseEntity<Payment> refundPayment(@PathVariable Long id) {
+        try {
+            Payment refundedPayment = paymentService.refundPayment(id);
+            return new ResponseEntity<>(refundedPayment, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        } catch (IllegalStateException e) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        Refund refund = paymentService.processRefund(paymentOptional.get(), refundDTO);
-        refundRepository.save(refund);
-
-        RefundDTO responseDTO = new RefundDTO(refund.getAmount(), refund.getReason(), refund.getRefundMethod(), refund.getRefundAccount());
-
-        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
-    }*/
-
+    }
 }

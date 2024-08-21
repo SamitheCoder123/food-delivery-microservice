@@ -1,27 +1,21 @@
 package com.swiggy.app.demo.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-/**
- * @author
- **/
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
 @Table(name = "payments")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Payment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String orderId;
 
     @Column(nullable = false)
@@ -32,7 +26,6 @@ public class Payment {
     private PaymentMethod paymentMethod;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status")
+    @Column(nullable = false)
     private PaymentStatus status;
-
 }
