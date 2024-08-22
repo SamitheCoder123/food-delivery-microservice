@@ -34,7 +34,7 @@ public class LocationServiceUtility {
     private static final String DB_PASSWORD = "Admin@123";
 
     // SQL query for inserting location data
-    private static final String INSERT_LOCATION_SQL = "INSERT INTO location (id, latitude, longitude, address, city, state, zip_code) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    private static final String INSERT_LOCATION_SQL = "INSERT INTO location (id, latitude, longitude, address, city, restaurant_name, zip_code) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
     public static void loadLocationsToDB() {
         try {
@@ -59,7 +59,7 @@ public class LocationServiceUtility {
                             preparedStatement.setDouble(3, location.getDouble("longitude"));
                             preparedStatement.setString(4, location.getString("address"));
                             preparedStatement.setString(5, location.getString("city"));
-                            preparedStatement.setString(6, location.getString("state"));
+                            preparedStatement.setString(6, location.getString("restaurantName"));
                             preparedStatement.setString(7, location.getString("zipCode"));
 
                             // Log the query execution

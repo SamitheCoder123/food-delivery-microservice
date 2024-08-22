@@ -22,6 +22,6 @@ public class Location {
     private Double longitude;
     private String address;
     private String city;
-    private String state;
+    private String restaurantName;
     private String zipCode;
 }

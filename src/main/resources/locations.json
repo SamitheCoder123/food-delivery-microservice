@@ -1,29 +1,29 @@
 [
   {
-    "id": 1,
+    "id": 101,
     "latitude": 12.9715987,
     "longitude": 77.5945627,
-    "address": "123 Main St",
+    "address": "Vasantnagar Main Road",
     "city": "Bangalore",
-    "state": "Karnataka",
+    "restaurantName": "Empire",
     "zipCode": "560001"
   },
   {
-    "id": 2,
+    "id": 102,
     "latitude": 28.6139391,
     "longitude": 77.2090212,
-    "address": "456 Elm St",
-    "city": "Delhi",
-    "state": "Delhi",
+    "address": "AShok Nagar",
+    "city": "Bangalore",
+    "restaurantName": "Swati",
     "zipCode": "110001"
   },
   {
-    "id": 3,
+    "id": 103,
     "latitude": 19.076090,
     "longitude": 72.877426,
-    "address": "789 Oak St",
-    "city": "Mumbai",
-    "state": "Maharashtra",
+    "address": "Ali Askar Road",
+    "city": "Bangalore",
+    "restaurantName": "Samrudhi",
     "zipCode": "400001"
   }
 ]
