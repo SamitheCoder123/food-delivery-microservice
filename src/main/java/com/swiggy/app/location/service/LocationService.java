@@ -1,6 +1,6 @@
-package com.swiggy.app.demo.service;
+package com.swiggy.app.location.service;
 
-import com.swiggy.app.demo.entity.Location;
+import com.swiggy.app.location.entity.Location;
 
 import java.util.List;
 import java.util.Optional;

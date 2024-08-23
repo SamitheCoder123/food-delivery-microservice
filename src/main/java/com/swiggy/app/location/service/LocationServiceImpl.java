@@ -1,9 +1,8 @@
-package com.swiggy.app.demo.service;
+package com.swiggy.app.location.service;
 
-import com.swiggy.app.demo.entity.Location;
-import com.swiggy.app.demo.repository.LocationRepo;
-import com.swiggy.app.demo.util.LocationServiceUtility;
-import org.hibernate.annotations.SecondaryRow;
+import com.swiggy.app.location.entity.Location;
+import com.swiggy.app.location.repository.LocationRepo;
+import com.swiggy.app.location.util.LocationServiceUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

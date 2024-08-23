@@ -1,7 +1,7 @@
-package com.swiggy.app.demo.controller;
+package com.swiggy.app.location.controller;
 
-import com.swiggy.app.demo.entity.Location;
-import com.swiggy.app.demo.service.LocationService;
+import com.swiggy.app.location.entity.Location;
+import com.swiggy.app.location.service.LocationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

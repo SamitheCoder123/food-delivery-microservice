@@ -1,6 +1,6 @@
-package com.swiggy.app.demo.repository;
+package com.swiggy.app.location.repository;
 
-import com.swiggy.app.demo.entity.Location;
+import com.swiggy.app.location.entity.Location;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

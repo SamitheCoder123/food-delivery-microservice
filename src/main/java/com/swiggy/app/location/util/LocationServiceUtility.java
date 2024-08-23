@@ -1,4 +1,4 @@
-package com.swiggy.app.demo.util;
+package com.swiggy.app.location.util;
 
 
 

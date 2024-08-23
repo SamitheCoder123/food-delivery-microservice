@@ -1,4 +1,4 @@
-package com.swiggy.app.demo;
+package com.swiggy.app.location;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

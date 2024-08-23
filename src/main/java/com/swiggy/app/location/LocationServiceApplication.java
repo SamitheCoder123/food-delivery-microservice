@@ -1,4 +1,4 @@
-package com.swiggy.app.demo;
+package com.swiggy.app.location;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,4 +1,4 @@
-package com.swiggy.app.demo.dto;
+package com.swiggy.app.location.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

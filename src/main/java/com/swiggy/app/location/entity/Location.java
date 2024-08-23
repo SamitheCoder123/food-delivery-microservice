@@ -1,4 +1,4 @@
-package com.swiggy.app.demo.entity;
+package com.swiggy.app.location.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
