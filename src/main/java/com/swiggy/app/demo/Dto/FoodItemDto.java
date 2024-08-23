@@ -24,5 +24,6 @@ public class FoodItemDto {
     private Long id;                  // Unique identifier for the food item
     private String name;              // Name of the food item
     private Double price;             // Price of the food item
+    private String type;              // Starter, Main Course, or Dessert
     private Long menuId;              // Foreign key to the Menu entity
 }

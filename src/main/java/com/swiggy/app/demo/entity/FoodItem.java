@@ -27,6 +27,9 @@ public class FoodItem {
     @Column(name = "price", nullable = false)
     private Double price;
 
+    @Column(name = "type", nullable = false)
+    private String type; // Starter, Main Course, or Dessert
+
     @ManyToOne
     @JoinColumn(name = "menu_id", nullable = false)
     private Menu menu;

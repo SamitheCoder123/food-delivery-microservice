@@ -29,6 +29,9 @@ public class Menu {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "category", nullable = false)
+    private String category; // Veg or Non-Veg
+
     @ManyToOne
     @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;

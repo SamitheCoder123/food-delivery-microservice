@@ -12,6 +12,5 @@ import java.util.List;
 @Repository
 public interface FoodItemRepo extends JpaRepository<FoodItem, Long> {
 
-    // Custom query to find food items by menu ID
-    List<FoodItem> findByMenuId(Long menuId);
+    List<FoodItem> findByType(String type); // Find food items by type
 }

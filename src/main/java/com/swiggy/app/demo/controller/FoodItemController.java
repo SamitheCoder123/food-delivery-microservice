@@ -3,6 +3,7 @@ package com.swiggy.app.demo.controller;
 import com.swiggy.app.demo.Dto.FoodItemDto;
 import com.swiggy.app.demo.service.FoodItemService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,31 +22,35 @@ public class FoodItemController {
     // Create a new FoodItem
     @PostMapping
     public ResponseEntity<FoodItemDto> createFoodItem(@RequestBody FoodItemDto foodItemDto) {
-        return ResponseEntity.ok(foodItemService.createFoodItem(foodItemDto));
+        FoodItemDto createdFoodItem = foodItemService.createFoodItem(foodItemDto);
+        return new ResponseEntity<>(createdFoodItem, HttpStatus.CREATED);
     }
 
     // Get a FoodItem by ID
     @GetMapping("/{id}")
     public ResponseEntity<FoodItemDto> getFoodItemById(@PathVariable Long id) {
-        return ResponseEntity.ok(foodItemService.getFoodItemById(id));
+        FoodItemDto foodItemDto = foodItemService.getFoodItemById(id);
+        return new ResponseEntity<>(foodItemDto, HttpStatus.OK);
     }
 
     // Get all FoodItems
     @GetMapping
     public ResponseEntity<List<FoodItemDto>> getAllFoodItems() {
-        return ResponseEntity.ok(foodItemService.getAllFoodItems());
+        List<FoodItemDto> foodItems = foodItemService.getAllFoodItems();
+        return new ResponseEntity<>(foodItems, HttpStatus.OK);
     }
 
     // Update a FoodItem
     @PutMapping("/{id}")
     public ResponseEntity<FoodItemDto> updateFoodItem(@PathVariable Long id, @RequestBody FoodItemDto foodItemDto) {
-        return ResponseEntity.ok(foodItemService.updateFoodItem(id, foodItemDto));
+        FoodItemDto updatedFoodItem = foodItemService.updateFoodItem(id, foodItemDto);
+        return new ResponseEntity<>(updatedFoodItem, HttpStatus.OK);
     }
 
     // Delete a FoodItem
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteFoodItem(@PathVariable Long id) {
         foodItemService.deleteFoodItem(id);
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

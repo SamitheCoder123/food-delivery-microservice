@@ -22,6 +22,8 @@ import java.util.List;
 public class MenuDto {
     private Long id;                      // Unique identifier for the menu
     private String name;                  // Name of the menu
-    private Long restaurantId;            // Foreign key to the Restaurant entity
-    private List<FoodItemDto> foodItems;  // List of food items associated with this menu
+    private Long restaurantId;
+    private String category;              // Veg or Non-Veg// Foreign key to the Restaurant entity
+    private List<FoodItemDto> foodItems;
+    // List of food items associated with this menu
 }

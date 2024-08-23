@@ -51,6 +51,7 @@ public class FoodItemServiceImpl implements FoodItemService {
                 .orElseThrow(() -> new ResourceNotFoundException("Food item not found"));
         foodItem.setName(foodItemDto.getName());
         foodItem.setPrice(foodItemDto.getPrice());
+        foodItem.setType(foodItemDto.getType()); // Update type
         foodItem = foodItemRepository.save(foodItem);
         return objectMapper.convertValue(foodItem, FoodItemDto.class);
     }

@@ -53,6 +53,7 @@ public class MenuServiceImpl implements MenuService {
         Menu menu = menuRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Menu not found"));
         menu.setName(menuDto.getName());
+        menu.setCategory(menuDto.getCategory()); // Update category
         menu = menuRepository.save(menu);
         return objectMapper.convertValue(menu, MenuDto.class);
     }
