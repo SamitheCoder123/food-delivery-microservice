@@ -5,6 +5,6 @@ import com.swiggy.app.demo.Entity.Tracking;
 import java.util.List;
 
 public interface TrackingService {
-    void addTrackingEntry(Tracking tracking);
-    List<Tracking> getTrackingHistory(Long orderId);
+    String addTrackingEntry(Tracking tracking);
+    Tracking getCurrentTracking(Long orderId);
 }

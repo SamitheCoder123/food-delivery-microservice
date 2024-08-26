@@ -1,10 +1,12 @@
 package com.swiggy.app.demo.Entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import java.time.LocalDateTime;
+
+import java.util.Date;
 
 @Entity
 public class Tracking {
@@ -15,9 +17,13 @@ public class Tracking {
 
     private Long orderId;
     private String status;
-    private LocalDateTime timestamp;
 
-    // Getters and setters
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Kolkata")
+    private Date timestamp;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Kolkata")
+    private Date expectedDeliveryTime;
+
 
     public Long getId() {
         return id;
@@ -43,11 +49,19 @@ public class Tracking {
         this.status = status;
     }
 
-    public LocalDateTime getTimestamp() {
+    public Date getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(LocalDateTime timestamp) {
+    public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public Date getExpectedDeliveryTime() {
+        return expectedDeliveryTime;
+    }
+
+    public void setExpectedDeliveryTime(Date expectedDeliveryTime) {
+        this.expectedDeliveryTime = expectedDeliveryTime;
     }
 }

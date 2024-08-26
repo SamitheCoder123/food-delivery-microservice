@@ -16,4 +16,7 @@ public class TrackingDTO {
     private Long orderId;
     private String status;
     private LocalDateTime timestamp;
+    private LocalDateTime expectedDeliveryTime;
+    private String timeRemaining;
+    private Long remainingMinutes;
 }

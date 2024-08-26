@@ -17,15 +17,15 @@ public class TrackingController {
     private TrackingService trackingService;
 
     @PostMapping("/orders/{orderId}")
-    public ResponseEntity<Void> addTrackingEntry(@PathVariable Long orderId, @RequestBody Tracking tracking) {
+    public ResponseEntity<String> addTrackingEntry(@PathVariable Long orderId, @RequestBody Tracking tracking) {
         tracking.setOrderId(orderId);
-        trackingService.addTrackingEntry(tracking);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        String success = trackingService.addTrackingEntry(tracking);
+        return new ResponseEntity<>(success,HttpStatus.CREATED);
     }
 
     @GetMapping("/orders/{orderId}")
-    public ResponseEntity<List<Tracking>> getTrackingHistory(@PathVariable Long orderId) {
-        List<Tracking> trackingHistory = trackingService.getTrackingHistory(orderId);
-        return new ResponseEntity<>(trackingHistory, HttpStatus.OK);
+    public ResponseEntity<Tracking> getTrackingStatus(@PathVariable Long orderId) {
+        Tracking tracking = trackingService.getCurrentTracking(orderId);
+        return new ResponseEntity<>(tracking, HttpStatus.OK);
     }
 }
