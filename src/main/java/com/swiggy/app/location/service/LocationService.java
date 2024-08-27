@@ -3,6 +3,7 @@ package com.swiggy.app.location.service;
 import com.swiggy.app.location.entity.Location;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -18,4 +19,6 @@ public interface LocationService {
     void deleteLocation(Long id);
 
     void loadLocations();
+
+    String getRestaurantByLocation(Map<String, Object> request);
 }

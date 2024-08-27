@@ -5,8 +5,10 @@ import com.swiggy.app.location.repository.LocationRepo;
 import com.swiggy.app.location.util.LocationServiceUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -14,6 +16,9 @@ import java.util.Optional;
  **/
 @Service
 public class LocationServiceImpl implements LocationService  {
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Autowired
     private LocationRepo locationRepository;
@@ -43,5 +48,12 @@ public class LocationServiceImpl implements LocationService  {
 
     public void loadLocations() {
         locationServiceUtility.loadLocationsToDB();
+    }
+
+    @Override
+    public String getRestaurantByLocation(Map<String, Object> request) {
+        Object locationId = request.get("locationId");
+        String restaurantServiceUrl = "http://localhost:8003/api/restaurants/findByLocation?locationId=" + locationId;
+        return restTemplate.getForObject(restaurantServiceUrl, String.class);
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Map;
 
 /**
  * @author
@@ -53,6 +54,12 @@ public class LocationController {
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Failed to load locations: " + e.getMessage());
         }
+    }
+
+    @PostMapping("/getResto")
+    public ResponseEntity<String> getRestaurant(@RequestBody Map<String,Object> request){
+        String restaurantByLocation = locationService.getRestaurantByLocation(request);
+        return ResponseEntity.ok(restaurantByLocation);
     }
 }
 
