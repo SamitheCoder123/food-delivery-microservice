@@ -28,4 +28,14 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PaymentStatus status;
+
+    // New fields for UPI validation
+    @Column(nullable = true)
+    private String upiId;
+
+    @Column(nullable = true)
+    private String linkedPhoneNumber;
+
+    @Column(nullable = true)
+    private String password;
 }

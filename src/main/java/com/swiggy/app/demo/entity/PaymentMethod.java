@@ -5,7 +5,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum PaymentMethod {
     COD("COD"),
-    UPI("UPI"),
+    UPI_GOOGLE_PAY("UPI_GOOGLE_PAY"),
+    UPI_PHONEPE("UPI_PHONEPE"),
+    UPI_PAYTM("UPI_PAYTM"),
     CREDIT_CARD("CREDIT_CARD"),
     DEBIT_CARD("DEBIT_CARD");
 

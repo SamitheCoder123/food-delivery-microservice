@@ -24,7 +24,10 @@ public class PaymentController {
             Payment payment = paymentService.processPayment(
                     paymentRequest.getOrderId(),
                     paymentRequest.getAmount(),
-                    paymentRequest.getPaymentMethod()
+                    paymentRequest.getPaymentMethod(),
+                    paymentRequest.getUpiId(),
+                    paymentRequest.getLinkedPhoneNumber(),
+                    paymentRequest.getPassword()
             );
             return new ResponseEntity<>(payment, HttpStatus.CREATED);
         } catch (UnsupportedOperationException e) {

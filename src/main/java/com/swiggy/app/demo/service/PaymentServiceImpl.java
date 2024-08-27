@@ -17,19 +17,24 @@ public class PaymentServiceImpl implements PaymentService {
     private PaymentRepository paymentRepository;
 
     @Override
-    public Payment processPayment(String orderId, double amount, PaymentMethod paymentMethod) {
+    public Payment processPayment(String orderId, double amount, PaymentMethod paymentMethod,String upiId,String linkedPhoneNumber,String password) {
         Payment payment = Payment.builder()
                 .orderId(orderId)
                 .amount(amount)
                 .paymentMethod(paymentMethod)
                 .status(PaymentStatus.PENDING)
+                .upiId(upiId)
+                .linkedPhoneNumber(linkedPhoneNumber)
+                .password(password)
                 .build();
 
         switch (paymentMethod) {
             case COD:
                 processCOD(payment);
                 break;
-            case UPI:
+            case UPI_GOOGLE_PAY:
+            case UPI_PHONEPE:
+            case UPI_PAYTM:
                 processUPI(payment);
                 break;
             case CREDIT_CARD:
@@ -80,14 +85,68 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private void processUPI(Payment payment) {
-        boolean transactionSuccess = simulateUPITransaction();
+        boolean isValid;
+        switch (payment.getPaymentMethod()) {
+            case UPI_GOOGLE_PAY:
+                isValid = validateGooglePay(payment.getUpiId(), payment.getLinkedPhoneNumber(), payment.getPassword());
+                break;
+            case UPI_PHONEPE:
+                isValid = validatePhonePe(payment.getUpiId(), payment.getLinkedPhoneNumber(), payment.getPassword());
+                break;
+            case UPI_PAYTM:
+                isValid = validatePaytm(payment.getUpiId(), payment.getLinkedPhoneNumber(), payment.getPassword());
+                break;
+            default:
+                throw new UnsupportedOperationException("Unsupported UPI method: " + payment.getPaymentMethod());
+        }
+
+        if (!isValid) {
+            payment.setStatus(PaymentStatus.FAILED);
+            System.out.println("UPI validation failed for " + payment.getPaymentMethod());
+            return;
+        }
+
+        boolean transactionSuccess = simulateUPITransaction(payment.getPaymentMethod().getMethod());
         if (transactionSuccess) {
             payment.setStatus(PaymentStatus.COMPLETED);
-            System.out.println("Payment completed via UPI.");
+            System.out.println("Payment completed via " + payment.getPaymentMethod() + ".");
         } else {
             payment.setStatus(PaymentStatus.FAILED);
-            System.out.println("UPI payment failed.");
+            System.out.println(payment.getPaymentMethod() + " payment failed.");
         }
+    }
+
+    private boolean validateGooglePay(String upiId, String linkedPhoneNumber, String password) {
+        // Google Pay specific validation logic
+        return validateUPICommonFields(upiId, linkedPhoneNumber, password);
+    }
+
+    private boolean validatePhonePe(String upiId, String linkedPhoneNumber, String password) {
+        // PhonePe specific validation logic
+        return validateUPICommonFields(upiId, linkedPhoneNumber, password);
+    }
+
+    private boolean validatePaytm(String upiId, String linkedPhoneNumber, String password) {
+        // Paytm specific validation logic
+        return validateUPICommonFields(upiId, linkedPhoneNumber, password);
+    }
+
+    private boolean validateUPICommonFields(String upiId, String linkedPhoneNumber, String password) {
+        // Common UPI validation logic
+        if (upiId == null || upiId.isEmpty()) {
+            System.out.println("Invalid UPI ID.");
+            return false;
+        }
+        if (linkedPhoneNumber == null || linkedPhoneNumber.isEmpty()) {
+            System.out.println("Invalid linked phone number.");
+            return false;
+        }
+        if (password == null || password.isEmpty()) {
+            System.out.println("Invalid password.");
+            return false;
+        }
+        // Further validation logic, such as checking formats or database records, can be added here
+        return true;
     }
 
     private void processCardPayment(Payment payment) {
@@ -101,7 +160,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
 
-    private boolean simulateUPITransaction() {
+    private boolean simulateUPITransaction(String upiProvider) {
         // Simulate UPI transaction logic here
         return true; // For testing purposes, always successful
     }
