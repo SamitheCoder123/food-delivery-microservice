@@ -23,4 +23,5 @@ public class RestaurantDto {
     private String name;               // Name of the restaurant
     private String location;           // Location of the restaurant
     private List<MenuDto> menus;       // List of menus associated with this restaurant
+    private int locationId;
 }

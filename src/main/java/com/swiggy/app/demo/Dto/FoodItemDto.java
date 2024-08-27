@@ -26,4 +26,5 @@ public class FoodItemDto {
     private Double price;             // Price of the food item
     private String type;              // Starter, Main Course, or Dessert
     private Long menuId;              // Foreign key to the Menu entity
+
 }

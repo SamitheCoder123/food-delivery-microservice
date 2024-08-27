@@ -1,6 +1,8 @@
 package com.swiggy.app.demo.service;
 
 import com.swiggy.app.demo.Dto.RestaurantDto;
+import com.swiggy.app.demo.entity.Restaurant;
+//import com.swiggy.app.demo.entity.Restaurant;
 
 import java.util.List;
 
@@ -13,5 +15,6 @@ public interface RestaurantService {
     RestaurantDto getRestaurantById(Long id);
     List<RestaurantDto> getAllRestaurants();
     RestaurantDto updateRestaurant(Long id, RestaurantDto restaurantDto);
-    void deleteRestaurant(Long id);
+    String deleteRestaurant(Long id);
+    RestaurantDto getRestaurantByLocationId(Long locationId);
 }

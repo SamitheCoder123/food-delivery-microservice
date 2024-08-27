@@ -1,6 +1,7 @@
 package com.swiggy.app.demo.controller;
 
 import com.swiggy.app.demo.Dto.RestaurantDto;
+import com.swiggy.app.demo.entity.Restaurant;
 import com.swiggy.app.demo.service.RestaurantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -44,8 +45,18 @@ public class RestaurantController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteRestaurant(@PathVariable Long id) {
-        restaurantService.deleteRestaurant(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    public ResponseEntity<String> deleteRestaurant(@PathVariable Long id) {
+        String response = restaurantService.deleteRestaurant(id);
+        return new ResponseEntity<>(response,HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/findByLocation")
+    public ResponseEntity<RestaurantDto> getRestaurantByLocationId(@RequestParam Long locationId) {
+        RestaurantDto restaurantDTO = restaurantService.getRestaurantByLocationId(locationId);
+        if (restaurantDTO != null) {
+            return ResponseEntity.ok(restaurantDTO);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

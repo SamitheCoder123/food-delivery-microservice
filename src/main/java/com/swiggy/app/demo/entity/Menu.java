@@ -1,8 +1,6 @@
 package com.swiggy.app.demo.entity;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -34,6 +32,7 @@ public class Menu {
 
     @ManyToOne
     @JoinColumn(name = "restaurant_id", nullable = false)
+   // @JsonIgnore
     private Restaurant restaurant;
 
     @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL, orphanRemoval = true)

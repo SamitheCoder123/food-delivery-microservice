@@ -29,8 +29,11 @@ public class Restaurant {
     @Column(name = "location", nullable = false)
     private String location;
 
-
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+   // @JsonIgnore
     private List<Menu> menus;
 
+    @Column(name = "location_id", nullable = false)
+    @JsonProperty("locationId")
+    private int locationId;
 }

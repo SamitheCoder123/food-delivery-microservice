@@ -2,15 +2,19 @@ package com.swiggy.app.demo.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.swiggy.app.demo.Dto.RestaurantDto;
+//import com.swiggy.app.demo.Exception.ResourceNotFoundException;
+import com.swiggy.app.demo.Exception.ResourceNotFoundException;
 import com.swiggy.app.demo.entity.FoodItem;
 import com.swiggy.app.demo.entity.Menu;
 import com.swiggy.app.demo.entity.Restaurant;
 import com.swiggy.app.demo.repository.RestaurantRepo;
 import jakarta.transaction.Transactional;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -25,6 +29,9 @@ public class RestaurantServiceImpl implements RestaurantService {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
     public RestaurantDto createRestaurant(RestaurantDto restaurantDto) {
@@ -72,9 +79,15 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
-    public void deleteRestaurant(Long id) {
+    public String deleteRestaurant(Long id) {
         Restaurant restaurant = restaurantRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Restaurant not found"));
         restaurantRepository.delete(restaurant);
+        return "Deleted Successfully";
+    }
+
+    public RestaurantDto getRestaurantByLocationId(Long locationId) {
+        Restaurant restaurant = restaurantRepository.findByLocationId(locationId);
+        return restaurant != null ? modelMapper.map(restaurant, RestaurantDto.class) : null;
     }
 }

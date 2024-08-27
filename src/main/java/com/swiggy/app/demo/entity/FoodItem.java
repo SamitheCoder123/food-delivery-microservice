@@ -1,5 +1,6 @@
 package com.swiggy.app.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,5 +33,6 @@ public class FoodItem {
 
     @ManyToOne
     @JoinColumn(name = "menu_id", nullable = false)
+    //@JsonIgnore
     private Menu menu;
 }
