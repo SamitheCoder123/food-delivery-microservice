@@ -51,8 +51,8 @@ public class RestaurantController {
     }
 
     @GetMapping("/findByLocation")
-    public ResponseEntity<RestaurantDto> getRestaurantByLocationId(@RequestParam Long locationId) {
-        RestaurantDto restaurantDTO = restaurantService.getRestaurantByLocationId(locationId);
+    public ResponseEntity<RestaurantDto> getRestaurantByLocationId(@RequestParam Long restoLocationId) {
+        RestaurantDto restaurantDTO = restaurantService.getRestaurantByLocationId(restoLocationId);
         if (restaurantDTO != null) {
             return ResponseEntity.ok(restaurantDTO);
         } else {

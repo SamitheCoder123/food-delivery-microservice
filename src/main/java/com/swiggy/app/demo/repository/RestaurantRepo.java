@@ -14,6 +14,6 @@ import java.util.Optional;
 
 @Repository
 public interface RestaurantRepo extends JpaRepository<Restaurant, Long> {
-    @Query(value = "SELECT * FROM restaurants WHERE location_id = :locationId", nativeQuery = true)
-    Restaurant findByLocationId(@Param("locationId") long locationId);
+    @Query(value = "SELECT * FROM restaurants WHERE resto_location_id = :restoLocationId", nativeQuery = true)
+    Restaurant findByLocationId(@Param("restoLocationId") long restoLocationId);
 }

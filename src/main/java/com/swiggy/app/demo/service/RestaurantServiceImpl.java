@@ -86,8 +86,8 @@ public class RestaurantServiceImpl implements RestaurantService {
         return "Deleted Successfully";
     }
 
-    public RestaurantDto getRestaurantByLocationId(Long locationId) {
-        Restaurant restaurant = restaurantRepository.findByLocationId(locationId);
+    public RestaurantDto getRestaurantByLocationId(Long restoLocationId) {
+        Restaurant restaurant = restaurantRepository.findByLocationId(restoLocationId);
         return restaurant != null ? modelMapper.map(restaurant, RestaurantDto.class) : null;
     }
 }

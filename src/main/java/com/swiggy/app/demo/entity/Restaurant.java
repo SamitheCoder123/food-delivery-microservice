@@ -33,7 +33,7 @@ public class Restaurant {
    // @JsonIgnore
     private List<Menu> menus;
 
-    @Column(name = "location_id", nullable = false)
-    @JsonProperty("locationId")
-    private int locationId;
+    @Column(name = "resto_location_id", nullable = false)
+    @JsonProperty("restoLocationId")
+    private int restoLocationId;
 }

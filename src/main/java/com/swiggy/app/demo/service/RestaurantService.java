@@ -16,5 +16,5 @@ public interface RestaurantService {
     List<RestaurantDto> getAllRestaurants();
     RestaurantDto updateRestaurant(Long id, RestaurantDto restaurantDto);
     String deleteRestaurant(Long id);
-    RestaurantDto getRestaurantByLocationId(Long locationId);
+    RestaurantDto getRestaurantByLocationId(Long restoLocationId);
 }
