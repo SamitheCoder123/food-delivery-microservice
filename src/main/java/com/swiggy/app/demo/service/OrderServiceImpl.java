@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,10 +20,10 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl implements OrderService {
 
     @Autowired
-    private OrderRepo orderRepository;  // Use the correct instance variable name here
+    private OrderRepo orderRepository;
 
     @Autowired
-    private ObjectMapper objectMapper; // Inject ObjectMapper
+    private ObjectMapper objectMapper;
 
     @Override
     public OrderDto createOrder(OrderDto orderDTO) {
@@ -30,38 +31,41 @@ public class OrderServiceImpl implements OrderService {
             throw new IllegalArgumentException("OrderDto cannot be null");
         }
 
-        // Convert DTO to entity
         Order order = objectMapper.convertValue(orderDTO, Order.class);
-        // Handle OrderItems if necessary
-        if (order.getItems() != null) {
-            for (OrderItem item : order.getItems()) {
-                item.setOrder(order); // Set the order reference in each item
-            }
+
+        List<OrderItem> orderItems = new ArrayList<>();
+        if (orderDTO.getItems() != null) {
+            Order finalOrder = order;
+            orderItems = orderDTO.getItems().stream()
+                    .map(itemDto -> {
+                        OrderItem orderItem = objectMapper.convertValue(itemDto, OrderItem.class);
+                        orderItem.setOrder(finalOrder);
+                        return orderItem;
+                    })
+                    .collect(Collectors.toList());
         }
-        // Set additional fields if necessary
+
+        order.setItems(orderItems);
+
+        // Calculate the total amount
+        calculateTotalAmount(order);
+
         order.setCreatedAt(LocalDateTime.now());
         order.setUpdatedAt(LocalDateTime.now());
 
-        // Save the order entity
         order = orderRepository.save(order);
 
-        // Convert entity back to DTO
         return objectMapper.convertValue(order, OrderDto.class);
     }
 
     @Override
     public OrderDto getOrderById(Long id) {
-        Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
-        return objectMapper.convertValue(order, OrderDto.class);
+        return null;
     }
 
     @Override
     public List<OrderDto> getAllOrders() {
-        List<Order> orders = orderRepository.findAll();
-        return orders.stream()
-                .map(order -> objectMapper.convertValue(order, OrderDto.class))
-                .collect(Collectors.toList());
+        return List.of();
     }
 
     @Override
@@ -72,12 +76,38 @@ public class OrderServiceImpl implements OrderService {
         // Update order fields from DTO
         order.setTotalAmount(orderDTO.getTotalAmount());
         order.setStatus(orderDTO.getStatus());
+
+        // Update or add items
+        List<OrderItem> updatedItems = new ArrayList<>();
+        if (orderDTO.getItems() != null) {
+            Order finalOrder = order;
+            updatedItems = orderDTO.getItems().stream()
+                    .map(itemDto -> {
+                        OrderItem orderItem = objectMapper.convertValue(itemDto, OrderItem.class);
+                        orderItem.setOrder(finalOrder);
+                        return orderItem;
+                    })
+                    .collect(Collectors.toList());
+        }
+
+        order.getItems().clear();
+        order.getItems().addAll(updatedItems);
+
+        // Recalculate the total amount
+        calculateTotalAmount(order);
+
         order.setUpdatedAt(LocalDateTime.now());
 
-        // Save updated order
         order = orderRepository.save(order);
 
         return objectMapper.convertValue(order, OrderDto.class);
+    }
+
+    private void calculateTotalAmount(Order order) {
+        double total = order.getItems().stream()
+                .mapToDouble(item -> item.getPrice() * item.getQuantity())
+                .sum();
+        order.setTotalAmount(total);
     }
 
     @Override
@@ -86,5 +116,4 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
         orderRepository.delete(order);
     }
-
 }
