@@ -29,12 +29,12 @@ public class LocationServiceUtility {
     private static final Logger logger = LoggerFactory.getLogger(LocationServiceUtility.class);
 
     // Database connection details (Update these based on your setup)
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/food-delivery-app?useSSL=false&serverTimezone=UTC";
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/food-delivery-app1?useSSL=false&serverTimezone=UTC";
     private static final String DB_USER = "root";
     private static final String DB_PASSWORD = "Admin@123";
 
     // SQL query for inserting location data
-    private static final String INSERT_LOCATION_SQL = "INSERT INTO location (id, latitude, longitude, address, city, restaurant_name, zip_code) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    private static final String INSERT_LOCATION_SQL = "INSERT INTO location (id, latitude, longitude, address, city, restaurant_name, zip_code, resto_location_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
     public static void loadLocationsToDB() {
         try {
@@ -61,6 +61,7 @@ public class LocationServiceUtility {
                             preparedStatement.setString(5, location.getString("city"));
                             preparedStatement.setString(6, location.getString("restaurantName"));
                             preparedStatement.setString(7, location.getString("zipCode"));
+                            preparedStatement.setString(8, location.getString("restoLocationId"));
 
                             // Log the query execution
                             logger.debug("Executing query for location id: " + location.getInt("id"));

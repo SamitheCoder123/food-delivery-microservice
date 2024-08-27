@@ -52,8 +52,8 @@ public class LocationServiceImpl implements LocationService  {
 
     @Override
     public String getRestaurantByLocation(Map<String, Object> request) {
-        Object locationId = request.get("locationId");
-        String restaurantServiceUrl = "http://localhost:8003/api/restaurants/findByLocation?locationId=" + locationId;
+        Object restoLocationId = request.get("restoLocationId");
+        String restaurantServiceUrl = "http://localhost:8003/api/restaurants/findByLocation?restoLocationId=" + restoLocationId;
         return restTemplate.getForObject(restaurantServiceUrl, String.class);
     }
 }
