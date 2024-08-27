@@ -51,9 +51,9 @@ public class TrackingServiceImpl implements TrackingService {
         if (minutesRemaining > 30) {
             status = "Order Placed, Deliverd in(" + minutesRemaining + " min)";
         } else if (minutesRemaining > 10) {
-            status = "Great news! Your order is being freshly crafted with the finest ingredients. Get ready to savor something delicious—it's almost on its way to you in (" + minutesRemaining + " min)";
-        } else if (minutesRemaining > 0) {
-            status = "Order is out for delivery, Agent is at your location. Share OTP and get your order in  (" + minutesRemaining + " min)";
+            status = "Great news! Your order is being freshly crafted with the finest ingredients. Get ready to savor something delicious,it's almost on its way to you in(" + minutesRemaining + " min)";
+        } else if (minutesRemaining > 3) {
+            status = "Order is out for delivery, Agent is at your location. Share OTP and get your order in(" + minutesRemaining + " min)";
         } else {
             status = "Order delivered. Thank you!";
         }
