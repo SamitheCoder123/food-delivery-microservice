@@ -2,6 +2,7 @@ package com.swiggy.app.demo.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.swiggy.app.demo.Dto.OrderDto;
+import com.swiggy.app.demo.Dto.OrderItemDto;
 import com.swiggy.app.demo.Exception.ResourceNotFoundException;
 import com.swiggy.app.demo.entity.Order;
 import com.swiggy.app.demo.entity.OrderItem;
@@ -33,25 +34,15 @@ public class OrderServiceImpl implements OrderService {
 
         Order order = objectMapper.convertValue(orderDTO, Order.class);
 
-        List<OrderItem> orderItems = new ArrayList<>();
-        if (orderDTO.getItems() != null) {
-            Order finalOrder = order;
-            orderItems = orderDTO.getItems().stream()
-                    .map(itemDto -> {
-                        OrderItem orderItem = objectMapper.convertValue(itemDto, OrderItem.class);
-                        orderItem.setOrder(finalOrder);
-                        return orderItem;
-                    })
-                    .collect(Collectors.toList());
-        }
+        // Automatically handle the order items
+        processOrderItems(order, orderDTO.getItems());
 
-        order.setItems(orderItems);
-
-        // Calculate the total amount
+        // Automatically calculate the total amount
         calculateTotalAmount(order);
 
         order.setCreatedAt(LocalDateTime.now());
         order.setUpdatedAt(LocalDateTime.now());
+        order.setStatus("CART");
 
         order = orderRepository.save(order);
 
@@ -60,12 +51,17 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDto getOrderById(Long id) {
-        return null;
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+        return objectMapper.convertValue(order, OrderDto.class);
     }
 
     @Override
     public List<OrderDto> getAllOrders() {
-        return List.of();
+        List<Order> orders = orderRepository.findAll();
+        return orders.stream()
+                .map(order -> objectMapper.convertValue(order, OrderDto.class))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -73,27 +69,13 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
-        // Update order fields from DTO
-        order.setTotalAmount(orderDTO.getTotalAmount());
+        // Update the order fields
         order.setStatus(orderDTO.getStatus());
 
-        // Update or add items
-        List<OrderItem> updatedItems = new ArrayList<>();
-        if (orderDTO.getItems() != null) {
-            Order finalOrder = order;
-            updatedItems = orderDTO.getItems().stream()
-                    .map(itemDto -> {
-                        OrderItem orderItem = objectMapper.convertValue(itemDto, OrderItem.class);
-                        orderItem.setOrder(finalOrder);
-                        return orderItem;
-                    })
-                    .collect(Collectors.toList());
-        }
+        // Process the updated order items
+        processOrderItems(order, orderDTO.getItems());
 
-        order.getItems().clear();
-        order.getItems().addAll(updatedItems);
-
-        // Recalculate the total amount
+        // Automatically recalculate the total amount
         calculateTotalAmount(order);
 
         order.setUpdatedAt(LocalDateTime.now());
@@ -101,6 +83,38 @@ public class OrderServiceImpl implements OrderService {
         order = orderRepository.save(order);
 
         return objectMapper.convertValue(order, OrderDto.class);
+    }
+
+    private void processOrderItems(Order order, List<OrderItemDto> itemDtos) {
+        if (itemDtos == null) {
+            return;
+        }
+
+        // Clear existing items and update with new ones
+        order.getItems().clear();
+
+        for (OrderItemDto itemDto : itemDtos) {
+            OrderItem orderItem = objectMapper.convertValue(itemDto, OrderItem.class);
+            orderItem.setOrder(order);
+
+            // Check if the item already exists in the cart
+            OrderItem existingItem = findExistingItem(order, itemDto.getFoodItemId());
+
+            if (existingItem != null) {
+                // Update quantity and price if the item exists
+                existingItem.setQuantity(existingItem.getQuantity() + orderItem.getQuantity());
+                existingItem.setPrice(itemDto.getPrice());
+            } else {
+                order.getItems().add(orderItem);
+            }
+        }
+    }
+
+    private OrderItem findExistingItem(Order order, Long foodItemId) {
+        return order.getItems().stream()
+                .filter(item -> item.getFoodItemId().equals(foodItemId))
+                .findFirst()
+                .orElse(null);
     }
 
     private void calculateTotalAmount(Order order) {
