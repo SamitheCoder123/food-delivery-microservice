@@ -17,7 +17,10 @@ public class PaymentServiceImpl implements PaymentService {
     private PaymentRepository paymentRepository;
 
     @Override
-    public Payment processPayment(String orderId, double amount, PaymentMethod paymentMethod,String upiId,String linkedPhoneNumber,String password) {
+    public Payment processPayment(String orderId, double amount, PaymentMethod paymentMethod,
+                                  String upiId, String linkedPhoneNumber, String password,
+                                  String cardNumber, String cardHolderName, String expiryDate, String cvv) {
+
         Payment payment = Payment.builder()
                 .orderId(orderId)
                 .amount(amount)
@@ -26,6 +29,11 @@ public class PaymentServiceImpl implements PaymentService {
                 .upiId(upiId)
                 .linkedPhoneNumber(linkedPhoneNumber)
                 .password(password)
+                .cardNumber(cardNumber)
+                .cardHolderName(cardHolderName)
+                .expiryDate(expiryDate)
+                .cvv(cvv)
+                .availableBalance(1000) // Example balance, this should be retrieved dynamically
                 .build();
 
         switch (paymentMethod) {
@@ -39,7 +47,7 @@ public class PaymentServiceImpl implements PaymentService {
                 break;
             case CREDIT_CARD:
             case DEBIT_CARD:
-                processCardPayment(payment);
+                processCard(payment);
                 break;
             default:
                 throw new UnsupportedOperationException("Unsupported payment method: " + paymentMethod);
@@ -66,15 +74,8 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         payment.setStatus(PaymentStatus.PENDING);
-        // Simulate refund processing
         boolean refundSuccess = simulateRefundTransaction();
-        if (refundSuccess) {
-            payment.setStatus(PaymentStatus.COMPLETED);
-            System.out.println("Refund completed for payment ID: " + paymentId);
-        } else {
-            payment.setStatus(PaymentStatus.FAILED);
-            System.out.println("Refund failed for payment ID: " + paymentId);
-        }
+        payment.setStatus(refundSuccess ? PaymentStatus.COMPLETED : PaymentStatus.FAILED);
 
         return paymentRepository.save(payment);
     }
@@ -85,68 +86,36 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private void processUPI(Payment payment) {
-        boolean isValid;
-        switch (payment.getPaymentMethod()) {
-            case UPI_GOOGLE_PAY:
-                isValid = validateGooglePay(payment.getUpiId(), payment.getLinkedPhoneNumber(), payment.getPassword());
-                break;
-            case UPI_PHONEPE:
-                isValid = validatePhonePe(payment.getUpiId(), payment.getLinkedPhoneNumber(), payment.getPassword());
-                break;
-            case UPI_PAYTM:
-                isValid = validatePaytm(payment.getUpiId(), payment.getLinkedPhoneNumber(), payment.getPassword());
-                break;
-            default:
-                throw new UnsupportedOperationException("Unsupported UPI method: " + payment.getPaymentMethod());
-        }
-
+        boolean isValid = validateUPIPayment(payment);
         if (!isValid) {
             payment.setStatus(PaymentStatus.FAILED);
             System.out.println("UPI validation failed for " + payment.getPaymentMethod());
             return;
         }
 
-        boolean transactionSuccess = simulateUPITransaction(payment.getPaymentMethod().getMethod());
+        boolean transactionSuccess = simulateUPITransaction();
+        payment.setStatus(transactionSuccess ? PaymentStatus.COMPLETED : PaymentStatus.FAILED);
+
         if (transactionSuccess) {
-            payment.setStatus(PaymentStatus.COMPLETED);
             System.out.println("Payment completed via " + payment.getPaymentMethod() + ".");
         } else {
-            payment.setStatus(PaymentStatus.FAILED);
             System.out.println(payment.getPaymentMethod() + " payment failed.");
         }
     }
 
-    private boolean validateGooglePay(String upiId, String linkedPhoneNumber, String password) {
-        // Google Pay specific validation logic
-        return validateUPICommonFields(upiId, linkedPhoneNumber, password);
-    }
-
-    private boolean validatePhonePe(String upiId, String linkedPhoneNumber, String password) {
-        // PhonePe specific validation logic
-        return validateUPICommonFields(upiId, linkedPhoneNumber, password);
-    }
-
-    private boolean validatePaytm(String upiId, String linkedPhoneNumber, String password) {
-        // Paytm specific validation logic
-        return validateUPICommonFields(upiId, linkedPhoneNumber, password);
+    private boolean validateUPIPayment(Payment payment) {
+        switch (payment.getPaymentMethod()) {
+            case UPI_GOOGLE_PAY:
+            case UPI_PHONEPE:
+            case UPI_PAYTM:
+                return validateUPICommonFields(payment.getUpiId(), payment.getLinkedPhoneNumber(), payment.getPassword());
+            default:
+                throw new UnsupportedOperationException("Unsupported UPI method: " + payment.getPaymentMethod());
+        }
     }
 
     private boolean validateUPICommonFields(String upiId, String linkedPhoneNumber, String password) {
-        // Common UPI validation logic
-        if (!validateUpiId(upiId)) {
-            System.out.println("Invalid UPI ID.");
-            return false;
-        }
-        if (!validatePhoneNumber(linkedPhoneNumber)) {
-            System.out.println("Invalid linked phone number.");
-            return false;
-        }
-        if (!validatePassword(password)) {
-            System.out.println("Invalid password.");
-            return false;
-        }
-        // Further validation logic, such as checking formats or database records, can be added here
-        return true;
+        return validateUpiId(upiId) && validatePhoneNumber(linkedPhoneNumber) && validatePassword(password);
     }
 
     private boolean validatePhoneNumber(String linkedPhoneNumber) {
@@ -158,34 +127,66 @@ public class PaymentServiceImpl implements PaymentService {
         String passwordRegex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$";
         return password != null && password.matches(passwordRegex);
     }
+
     private boolean validateUpiId(String upiId) {
         String upiRegex = "^[\\w.-]+@[\\w.-]+$";
         return upiId != null && upiId.matches(upiRegex);
     }
 
-    private void processCardPayment(Payment payment) {
-        boolean transactionSuccess = simulateCardTransaction();
+    private void processCard(Payment payment) {
+        if (!validateCardDetails(payment)) {
+            payment.setStatus(PaymentStatus.FAILED);
+            System.out.println("Card validation failed.");
+            return;
+        }
+
+        boolean transactionSuccess = simulateCardTransaction(payment);
+        payment.setStatus(transactionSuccess ? PaymentStatus.COMPLETED : PaymentStatus.FAILED);
+
         if (transactionSuccess) {
-            payment.setStatus(PaymentStatus.COMPLETED);
             System.out.println("Payment completed via " + payment.getPaymentMethod() + ".");
         } else {
-            payment.setStatus(PaymentStatus.FAILED);
             System.out.println(payment.getPaymentMethod() + " payment failed.");
         }
     }
 
-    private boolean simulateUPITransaction(String upiProvider) {
-        // Simulate UPI transaction logic here
-        return true; // For testing purposes, always successful
+    private boolean validateCardDetails(Payment payment) {
+        return validateCardNumber(payment.getCardNumber()) &&
+                validateCVV(payment.getCvv()) &&
+                validateExpiryDate(payment.getExpiryDate()) &&
+                validateAvailableBalance(payment.getAvailableBalance(), payment.getAmount());
     }
 
-    private boolean simulateCardTransaction() {
-        // Simulate card transaction logic here
-        return true; // For testing purposes, always successful
+    private boolean validateCardNumber(String cardNumber) {
+        String cardRegex = "^[0-9]{16}$";
+        return cardNumber != null && cardNumber.matches(cardRegex);
+    }
+
+    private boolean validateCVV(String cvv) {
+        String cvvRegex = "^[0-9]{3}$";
+        return cvv != null && cvv.matches(cvvRegex);
+    }
+
+    private boolean validateExpiryDate(String expiryDate) {
+        String expiryRegex = "^(0[1-9]|1[0-2])/([0-9]{2})$";
+        return expiryDate != null && expiryDate.matches(expiryRegex);
+    }
+
+    private boolean validateAvailableBalance(double availableBalance, double amount) {
+        return availableBalance >= amount;
+    }
+
+    private boolean simulateUPITransaction() {
+        return true; // Simulate success for testing purposes
+    }
+
+    private boolean simulateCardTransaction(Payment payment) {
+        // Simulate deduction of amount from available balance
+        payment.setAvailableBalance(payment.getAvailableBalance() - payment.getAmount());
+        return payment.getAvailableBalance() >= 0; // Ensure balance is sufficient after deduction
     }
 
     private boolean simulateRefundTransaction() {
-        // Simulate refund transaction logic here
-        return true; // For testing purposes, always successful
+        return true; // Simulate success for testing purposes
     }
 }

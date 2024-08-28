@@ -38,4 +38,20 @@ public class Payment {
 
     @Column(nullable = true)
     private String password;
+
+    // New fields for card validation
+    @Column(nullable = true)
+    private String cardNumber;
+
+    @Column(nullable = true)
+    private String cardHolderName;
+
+    @Column(nullable = true)
+    private String expiryDate;
+
+    @Column(nullable = true)
+    private String cvv;
+
+    @Column(nullable = true)
+    private double availableBalance;
 }

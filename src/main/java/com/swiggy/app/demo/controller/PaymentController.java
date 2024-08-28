@@ -27,7 +27,11 @@ public class PaymentController {
                     paymentRequest.getPaymentMethod(),
                     paymentRequest.getUpiId(),
                     paymentRequest.getLinkedPhoneNumber(),
-                    paymentRequest.getPassword()
+                    paymentRequest.getPassword(),
+                    paymentRequest.getCardNumber(),
+                    paymentRequest.getCardHolderName(),
+                    paymentRequest.getExpiryDate(),
+                    paymentRequest.getCvv()
             );
             return new ResponseEntity<>(payment, HttpStatus.CREATED);
         } catch (UnsupportedOperationException e) {
