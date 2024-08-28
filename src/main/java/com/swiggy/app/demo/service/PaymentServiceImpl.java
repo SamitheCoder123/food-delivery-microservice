@@ -133,20 +133,34 @@ public class PaymentServiceImpl implements PaymentService {
 
     private boolean validateUPICommonFields(String upiId, String linkedPhoneNumber, String password) {
         // Common UPI validation logic
-        if (upiId == null || upiId.isEmpty()) {
+        if (!validateUpiId(upiId)) {
             System.out.println("Invalid UPI ID.");
             return false;
         }
-        if (linkedPhoneNumber == null || linkedPhoneNumber.isEmpty()) {
+        if (!validatePhoneNumber(linkedPhoneNumber)) {
             System.out.println("Invalid linked phone number.");
             return false;
         }
-        if (password == null || password.isEmpty()) {
+        if (!validatePassword(password)) {
             System.out.println("Invalid password.");
             return false;
         }
         // Further validation logic, such as checking formats or database records, can be added here
         return true;
+    }
+
+    private boolean validatePhoneNumber(String linkedPhoneNumber) {
+        String phoneRegex = "^[6-9]\\d{9}$";
+        return linkedPhoneNumber != null && linkedPhoneNumber.matches(phoneRegex);
+    }
+
+    private boolean validatePassword(String password) {
+        String passwordRegex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$";
+        return password != null && password.matches(passwordRegex);
+    }
+    private boolean validateUpiId(String upiId) {
+        String upiRegex = "^[\\w.-]+@[\\w.-]+$";
+        return upiId != null && upiId.matches(upiRegex);
     }
 
     private void processCardPayment(Payment payment) {
