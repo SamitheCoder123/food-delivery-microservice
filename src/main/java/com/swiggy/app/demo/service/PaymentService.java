@@ -13,7 +13,7 @@ public interface PaymentService {
 
     PaymentUpiDto processPaymentUpi(String orderId, double amount, PaymentMethod paymentMethod, String linkedPhoneNumber, String upiId, String password);
 
-    CashOnDeliveryDTO processPaymentCod(Long orderId, Double amount);
+    CashOnDeliveryDTO processPaymentCod(Long orderId, Double amount,PaymentMethod paymentMethod);
 
     Optional<PaymentCard> getPaymentById(Long id);
 

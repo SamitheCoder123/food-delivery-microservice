@@ -66,7 +66,9 @@ public class PaymentController {
         try {
             CashOnDeliveryDTO cashOnDeliveryDTO = paymentService.processPaymentCod(
                     paymentRequestCod.getOrderId(),
-                    paymentRequestCod.getAmount()
+                    paymentRequestCod.getAmount(),
+                    paymentRequestCod.getPaymentMethod()
+
             );
             return new ResponseEntity<>(cashOnDeliveryDTO, HttpStatus.CREATED);
         } catch (UnsupportedOperationException e) {

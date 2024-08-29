@@ -101,10 +101,11 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public CashOnDeliveryDTO processPaymentCod(Long orderId, Double amount) {
+    public CashOnDeliveryDTO processPaymentCod(Long orderId, Double amount, PaymentMethod paymentMethod) {
         CashOnDelivery cashOnDelivery = CashOnDelivery.builder()
                 .orderId(orderId)
                 .amount(amount)
+                .paymentMethod(paymentMethod)
                 .build();
 
         CashOnDelivery paymentCodResponse = processCOD(cashOnDelivery);

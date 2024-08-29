@@ -1,5 +1,6 @@
 package com.swiggy.app.demo.entity.cod;
 
+import com.swiggy.app.demo.entity.PaymentMethod;
 import com.swiggy.app.demo.entity.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -25,6 +26,11 @@ public class CashOnDelivery {
     @Column(nullable = false)
     private Double amount;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PaymentMethod paymentMethod;
+
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PaymentStatus status;
 
