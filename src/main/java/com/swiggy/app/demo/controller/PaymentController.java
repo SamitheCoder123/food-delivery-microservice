@@ -1,7 +1,11 @@
 package com.swiggy.app.demo.controller;
 
-import com.swiggy.app.demo.entity.Payment;
-import com.swiggy.app.demo.entity.PaymentMethod;
+import com.swiggy.app.demo.dto.CashOnDeliveryDTO;
+import com.swiggy.app.demo.dto.PaymentCardDto;
+import com.swiggy.app.demo.dto.PaymentUpiDto;
+import com.swiggy.app.demo.entity.cards.PaymentCard;
+import com.swiggy.app.demo.entity.cod.CashOnDelivery;
+import com.swiggy.app.demo.entity.upi.PaymentUpi;
 import com.swiggy.app.demo.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,23 +21,54 @@ public class PaymentController {
     @Autowired
     private PaymentService paymentService;
 
-    // Process Payment
-    @PostMapping
-    public ResponseEntity<Payment> processPayment(@RequestBody Payment paymentRequest) {
+    @PostMapping("/cards")
+    public ResponseEntity<PaymentCardDto> processPayment(@RequestBody PaymentCard paymentRequestCard) {
         try {
-            Payment payment = paymentService.processPayment(
-                    paymentRequest.getOrderId(),
-                    paymentRequest.getAmount(),
-                    paymentRequest.getPaymentMethod(),
-                    paymentRequest.getUpiId(),
-                    paymentRequest.getLinkedPhoneNumber(),
-                    paymentRequest.getPassword(),
-                    paymentRequest.getCardNumber(),
-                    paymentRequest.getCardHolderName(),
-                    paymentRequest.getExpiryDate(),
-                    paymentRequest.getCvv()
+            PaymentCardDto paymentCardDto = paymentService.processPayment(
+                    paymentRequestCard.getOrderId(),
+                    paymentRequestCard.getAmount(),
+                    paymentRequestCard.getPaymentMethod(),
+                    paymentRequestCard.getCardNumber(),
+                    paymentRequestCard.getCardHolderName(),
+                    paymentRequestCard.getExpiryDate(),
+                    paymentRequestCard.getCvv(),
+                    paymentRequestCard.getAvailableBalance()
             );
-            return new ResponseEntity<>(payment, HttpStatus.CREATED);
+            return new ResponseEntity<>(paymentCardDto, HttpStatus.CREATED);
+        } catch (UnsupportedOperationException e) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/upi")
+    public ResponseEntity<PaymentUpiDto> processPaymentUpi(@RequestBody PaymentUpi paymentRequestUpi) {
+        try {
+            PaymentUpiDto paymentUpiDto = paymentService.processPaymentUpi(
+                    paymentRequestUpi.getOrderId(),
+                    paymentRequestUpi.getAmount(),
+                    paymentRequestUpi.getPaymentMethod(),
+                    paymentRequestUpi.getLinkedPhoneNumber(),
+                    paymentRequestUpi.getUpiId(),
+                    paymentRequestUpi.getPassword()
+            );
+            return new ResponseEntity<>(paymentUpiDto, HttpStatus.CREATED);
+        } catch (UnsupportedOperationException e) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/cod")
+    public ResponseEntity<CashOnDeliveryDTO> processPaymentCod(@RequestBody CashOnDelivery paymentRequestCod) {
+        try {
+            CashOnDeliveryDTO cashOnDeliveryDTO = paymentService.processPaymentCod(
+                    paymentRequestCod.getOrderId(),
+                    paymentRequestCod.getAmount()
+            );
+            return new ResponseEntity<>(cashOnDeliveryDTO, HttpStatus.CREATED);
         } catch (UnsupportedOperationException e) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
@@ -43,17 +78,17 @@ public class PaymentController {
 
     // Get Payment by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Payment> getPayment(@PathVariable Long id) {
-        Optional<Payment> payment = paymentService.getPaymentById(id);
+    public ResponseEntity<PaymentCard> getPayment(@PathVariable Long id) {
+        Optional<PaymentCard> payment = paymentService.getPaymentById(id);
         return payment.map(ResponseEntity::ok)
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     // Refund Payment
     @PostMapping("/{id}/refund")
-    public ResponseEntity<Payment> refundPayment(@PathVariable Long id) {
+    public ResponseEntity<PaymentCard> refundPayment(@PathVariable Long id) {
         try {
-            Payment refundedPayment = paymentService.refundPayment(id);
+            PaymentCard refundedPayment = paymentService.refundPayment(id);
             return new ResponseEntity<>(refundedPayment, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);

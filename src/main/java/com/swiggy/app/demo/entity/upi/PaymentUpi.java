@@ -1,16 +1,20 @@
-package com.swiggy.app.demo.entity;
+package com.swiggy.app.demo.entity.upi;
 
+import com.swiggy.app.demo.entity.PaymentMethod;
+import com.swiggy.app.demo.entity.PaymentStatus;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "payments")
+@Table(name = "payment_upi")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Payment {
-
+public class PaymentUpi {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,7 +33,6 @@ public class Payment {
     @Column(nullable = false)
     private PaymentStatus status;
 
-    // New fields for UPI validation
     @Column(nullable = true)
     private String upiId;
 
@@ -38,20 +41,4 @@ public class Payment {
 
     @Column(nullable = true)
     private String password;
-
-    // New fields for card validation
-    @Column(nullable = true)
-    private String cardNumber;
-
-    @Column(nullable = true)
-    private String cardHolderName;
-
-    @Column(nullable = true)
-    private String expiryDate;
-
-    @Column(nullable = true)
-    private String cvv;
-
-    @Column(nullable = true)
-    private double availableBalance;
 }

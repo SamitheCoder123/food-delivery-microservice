@@ -1,10 +1,17 @@
 package com.swiggy.app.demo.service;
 
-import com.swiggy.app.demo.entity.Payment;
+import com.swiggy.app.demo.dto.CashOnDeliveryDTO;
+import com.swiggy.app.demo.dto.PaymentCardDto;
+import com.swiggy.app.demo.dto.PaymentUpiDto;
+import com.swiggy.app.demo.entity.cards.PaymentCard;
 import com.swiggy.app.demo.entity.PaymentMethod;
 import com.swiggy.app.demo.entity.PaymentStatus;
+import com.swiggy.app.demo.entity.cod.CashOnDelivery;
+import com.swiggy.app.demo.entity.upi.PaymentUpi;
+import com.swiggy.app.demo.repository.PaymentCodRepository;
 import com.swiggy.app.demo.repository.PaymentRepository;
-import com.swiggy.app.demo.service.PaymentService;
+import com.swiggy.app.demo.repository.PaymentUpiRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,59 +23,54 @@ public class PaymentServiceImpl implements PaymentService {
     @Autowired
     private PaymentRepository paymentRepository;
 
-    @Override
-    public Payment processPayment(String orderId, double amount, PaymentMethod paymentMethod,
-                                  String upiId, String linkedPhoneNumber, String password,
-                                  String cardNumber, String cardHolderName, String expiryDate, String cvv) {
+    @Autowired
+    private PaymentUpiRepository paymentUpiRepository;
 
-        Payment payment = Payment.builder()
+    @Autowired
+    private PaymentCodRepository paymentCodRepository;
+
+    private final ModelMapper modelMapper;
+
+    @Autowired
+    public PaymentServiceImpl(ModelMapper modelMapper) {
+        this.modelMapper = modelMapper;
+    }
+
+    @Override
+    public PaymentCardDto processPayment(String orderId, double amount, PaymentMethod paymentMethod,
+                                         String cardNumber, String cardHolderName, String expiryDate, String cvv, double availableBalance) {
+
+        PaymentCard paymentcard = PaymentCard.builder()
                 .orderId(orderId)
                 .amount(amount)
                 .paymentMethod(paymentMethod)
                 .status(PaymentStatus.PENDING)
-                .upiId(upiId)
-                .linkedPhoneNumber(linkedPhoneNumber)
-                .password(password)
                 .cardNumber(cardNumber)
                 .cardHolderName(cardHolderName)
                 .expiryDate(expiryDate)
                 .cvv(cvv)
-                .availableBalance(1000) // Example balance, this should be retrieved dynamically
+                .availableBalance(availableBalance)
                 .build();
 
-        switch (paymentMethod) {
-            case COD:
-                processCOD(payment);
-                break;
-            case UPI_GOOGLE_PAY:
-            case UPI_PHONEPE:
-            case UPI_PAYTM:
-                processUPI(payment);
-                break;
-            case CREDIT_CARD:
-            case DEBIT_CARD:
-                processCard(payment);
-                break;
-            default:
-                throw new UnsupportedOperationException("Unsupported payment method: " + paymentMethod);
-        }
+        PaymentCard paymentcardResponse = processCard(paymentcard);
 
-        return paymentRepository.save(payment);
+        PaymentCard payment_done = paymentRepository.save(paymentcardResponse);
+        return modelMapper.map(payment_done, PaymentCardDto.class);
     }
 
     @Override
-    public Optional<Payment> getPaymentById(Long id) {
+    public Optional<PaymentCard> getPaymentById(Long id) {
         return paymentRepository.findById(id);
     }
 
     @Override
-    public Payment refundPayment(Long paymentId) {
-        Optional<Payment> paymentOpt = paymentRepository.findById(paymentId);
+    public PaymentCard refundPayment(Long paymentId) {
+        Optional<PaymentCard> paymentOpt = paymentRepository.findById(paymentId);
         if (paymentOpt.isEmpty()) {
             throw new IllegalArgumentException("Payment not found with ID: " + paymentId);
         }
 
-        Payment payment = paymentOpt.get();
+        PaymentCard payment = paymentOpt.get();
         if (payment.getStatus() != PaymentStatus.COMPLETED) {
             throw new IllegalStateException("Cannot refund payment with status: " + payment.getStatus());
         }
@@ -80,38 +82,64 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentRepository.save(payment);
     }
 
-    private void processCOD(Payment payment) {
-        payment.setStatus(PaymentStatus.COMPLETED);
-        System.out.println("Payment completed via COD.");
+    @Override
+    public PaymentUpiDto processPaymentUpi(String orderId, double amount, PaymentMethod paymentMethod, String linkedPhoneNumber, String upiId, String password) {
+        PaymentUpi paymentUpi = PaymentUpi.builder()
+                .orderId(orderId)
+                .amount(amount)
+                .paymentMethod(paymentMethod)
+                .status(PaymentStatus.PENDING)
+                .linkedPhoneNumber(linkedPhoneNumber)
+                .upiId(upiId)
+                .password(password)
+                .build();
+
+        PaymentUpi paymentUpiResponse = processUPI(paymentUpi);
+
+        PaymentUpi payment_done = paymentUpiRepository.save(paymentUpiResponse);
+        return modelMapper.map(payment_done, PaymentUpiDto.class);
     }
 
-    private void processUPI(Payment payment) {
-        boolean isValid = validateUPIPayment(payment);
+    @Override
+    public CashOnDeliveryDTO processPaymentCod(Long orderId, Double amount) {
+        CashOnDelivery cashOnDelivery = CashOnDelivery.builder()
+                .orderId(orderId)
+                .amount(amount)
+                .build();
+
+        CashOnDelivery paymentCodResponse = processCOD(cashOnDelivery);
+
+        CashOnDelivery payment_done = paymentCodRepository.save(paymentCodResponse);
+        return modelMapper.map(payment_done, CashOnDeliveryDTO.class);
+    }
+
+    private CashOnDelivery processCOD(CashOnDelivery paymentcod) {
+        paymentcod.setStatus(PaymentStatus.COMPLETED);
+        System.out.println("Payment completed via COD.");
+        return paymentcod;
+    }
+
+    private PaymentUpi processUPI(PaymentUpi paymentUpi) {
+        boolean isValid = validateUPIPayment(paymentUpi);
         if (!isValid) {
-            payment.setStatus(PaymentStatus.FAILED);
-            System.out.println("UPI validation failed for " + payment.getPaymentMethod());
-            return;
+            paymentUpi.setStatus(PaymentStatus.FAILED);
+            System.out.println("UPI validation failed for " + paymentUpi.getPaymentMethod());
         }
 
         boolean transactionSuccess = simulateUPITransaction();
-        payment.setStatus(transactionSuccess ? PaymentStatus.COMPLETED : PaymentStatus.FAILED);
+        paymentUpi.setStatus(transactionSuccess ? PaymentStatus.COMPLETED : PaymentStatus.FAILED);
 
         if (transactionSuccess) {
-            System.out.println("Payment completed via " + payment.getPaymentMethod() + ".");
+            System.out.println("Payment completed via " + paymentUpi.getPaymentMethod() + ".");
         } else {
-            System.out.println(payment.getPaymentMethod() + " payment failed.");
+            System.out.println(paymentUpi.getPaymentMethod() + " payment failed.");
         }
+        return paymentUpi;
     }
 
-    private boolean validateUPIPayment(Payment payment) {
-        switch (payment.getPaymentMethod()) {
-            case UPI_GOOGLE_PAY:
-            case UPI_PHONEPE:
-            case UPI_PAYTM:
-                return validateUPICommonFields(payment.getUpiId(), payment.getLinkedPhoneNumber(), payment.getPassword());
-            default:
-                throw new UnsupportedOperationException("Unsupported UPI method: " + payment.getPaymentMethod());
-        }
+    private boolean validateUPIPayment(PaymentUpi payment) {
+         return validateUPICommonFields(payment.getUpiId(), payment.getLinkedPhoneNumber(), payment.getPassword());
+
     }
 
     private boolean validateUPICommonFields(String upiId, String linkedPhoneNumber, String password) {
@@ -133,24 +161,24 @@ public class PaymentServiceImpl implements PaymentService {
         return upiId != null && upiId.matches(upiRegex);
     }
 
-    private void processCard(Payment payment) {
-        if (!validateCardDetails(payment)) {
-            payment.setStatus(PaymentStatus.FAILED);
+    private PaymentCard processCard(PaymentCard paymentCard) {
+        if (!validateCardDetails(paymentCard)) {
+            paymentCard.setStatus(PaymentStatus.FAILED);
             System.out.println("Card validation failed.");
-            return;
         }
 
-        boolean transactionSuccess = simulateCardTransaction(payment);
-        payment.setStatus(transactionSuccess ? PaymentStatus.COMPLETED : PaymentStatus.FAILED);
+        boolean transactionSuccess = simulateCardTransaction(paymentCard);
+        paymentCard.setStatus(transactionSuccess ? PaymentStatus.COMPLETED : PaymentStatus.FAILED);
 
         if (transactionSuccess) {
-            System.out.println("Payment completed via " + payment.getPaymentMethod() + ".");
+            System.out.println("Payment completed via " + paymentCard.getPaymentMethod() + ".");
         } else {
-            System.out.println(payment.getPaymentMethod() + " payment failed.");
+            System.out.println(paymentCard.getPaymentMethod() + " payment failed.");
         }
+        return paymentCard;
     }
 
-    private boolean validateCardDetails(Payment payment) {
+    private boolean validateCardDetails(PaymentCard payment) {
         return validateCardNumber(payment.getCardNumber()) &&
                 validateCVV(payment.getCvv()) &&
                 validateExpiryDate(payment.getExpiryDate()) &&
@@ -177,16 +205,15 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private boolean simulateUPITransaction() {
-        return true; // Simulate success for testing purposes
+        return true;
     }
 
-    private boolean simulateCardTransaction(Payment payment) {
-        // Simulate deduction of amount from available balance
+    private boolean simulateCardTransaction(PaymentCard payment) {
         payment.setAvailableBalance(payment.getAvailableBalance() - payment.getAmount());
-        return payment.getAvailableBalance() >= 0; // Ensure balance is sufficient after deduction
+        return payment.getAvailableBalance() >= 0;
     }
 
     private boolean simulateRefundTransaction() {
-        return true; // Simulate success for testing purposes
+        return true;
     }
 }
