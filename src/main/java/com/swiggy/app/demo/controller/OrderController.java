@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author
@@ -61,5 +62,11 @@ public class OrderController {
         } catch (ResourceNotFoundException ex) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @PostMapping("/callPayment")
+    public ResponseEntity<String> sendOderForPayment(@RequestBody Map<String,Object> request){
+        String paymentDone = orderService.getPaymentPage(request);
+        return ResponseEntity.ok(paymentDone);
     }
 }

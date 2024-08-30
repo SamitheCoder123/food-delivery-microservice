@@ -10,10 +10,12 @@ import com.swiggy.app.demo.repository.OrderRepo;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +27,10 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private RestTemplate restTemplate;
+
 
     @Override
     public OrderDto createOrder(OrderDto orderDTO) {
@@ -129,5 +135,11 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
         orderRepository.delete(order);
+    }
+
+    @Override
+    public String getPaymentPage(Map<String, Object> request) {
+        String restaurantServiceUrl = "http://localhost:8005/api/payments/cards";
+        return restTemplate.postForObject(restaurantServiceUrl, request, String.class);
     }
 }

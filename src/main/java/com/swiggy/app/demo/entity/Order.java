@@ -40,6 +40,9 @@ public class Order {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+ /*   @Column(name = "order_payment_id", nullable =false)
+    private Long orderPaymentId;
+*/
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
