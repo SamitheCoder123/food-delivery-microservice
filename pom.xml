@@ -11,8 +11,8 @@
     <groupId>com.swiggy.app</groupId>
     <artifactId>location</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>demo</name>
-    <description>Demo project for Spring Boot</description>
+    <name>location-service</name>
+    <description>location service project for Spring Boot</description>
     <url/>
     <licenses>
         <license/>

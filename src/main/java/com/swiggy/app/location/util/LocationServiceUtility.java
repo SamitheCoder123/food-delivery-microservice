@@ -36,16 +36,17 @@ public class LocationServiceUtility {
     // SQL query for inserting location data
     private static final String INSERT_LOCATION_SQL = "INSERT INTO location (id, latitude, longitude, address, city, restaurant_name, zip_code) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-    public static void loadLocationsToDB() {
+    public static Object loadLocationsToDB() {
+        JSONObject location = null;
         try {
             String jsonString = new String(Files.readAllBytes(Paths.get("src/main/resources/locations.json")));
 
-            JSONArray locationsArray;
+            JSONArray locationsArray = null;
             try {
                 locationsArray = new JSONArray(jsonString);
             } catch (JSONException e) {
                 logger.error("Error parsing locations JSON data: " + e.getMessage(), e);
-                return;
+                return locationsArray;
             }
 
             try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
@@ -53,7 +54,7 @@ public class LocationServiceUtility {
 
                     for (int i = 0; i < locationsArray.length(); i++) {
                         try {
-                            JSONObject location = locationsArray.getJSONObject(i);
+                            location = locationsArray.getJSONObject(i);
                             preparedStatement.setInt(1, location.getInt("id"));
                             preparedStatement.setDouble(2, location.getDouble("latitude"));
                             preparedStatement.setDouble(3, location.getDouble("longitude"));
@@ -85,5 +86,7 @@ public class LocationServiceUtility {
         } catch (SQLException e) {
             logger.error("Error saving location data to the database: " + e.getMessage(), e);
         }
+        return location;
+    }
 
-    }}
+}

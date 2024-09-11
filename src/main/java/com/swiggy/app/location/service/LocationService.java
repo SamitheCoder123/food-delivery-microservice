@@ -1,6 +1,9 @@
 package com.swiggy.app.location.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.swiggy.app.location.entity.Location;
+import com.swiggy.app.location.entity.restaurant.Restaurant;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,5 +20,11 @@ public interface LocationService {
 
     void deleteLocation(Long id);
 
-    void loadLocations();
+    ResponseEntity<String> loadLocations() throws JsonProcessingException;
+
+    ResponseEntity<String> findByLocationId(Long id);
+
+    Location findById(Long id);
+
+    Restaurant getRestaurantByLocation(Long id);
 }
