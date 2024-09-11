@@ -38,14 +38,15 @@ public class LocationServiceImpl implements LocationService  {
     @Autowired
     private  LocationServiceUtility locationServiceUtility;
 
+    @Autowired
+    private  RestTemplate restTemplate;
+/*
 
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
-    }
+    }*/
 
-    @Autowired
-    private  RestTemplate restTemplate;
 
     @Override
     public List<Location> getAllLocations() {
