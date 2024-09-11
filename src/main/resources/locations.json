@@ -1,29 +1,32 @@
 [
   {
-    "id": 101,
+    "id": 1,
     "latitude": 12.9715987,
     "longitude": 77.5945627,
-    "address": "Vasantnagar Main Road",
+    "address": "100ft road, Indiranagar",
     "city": "Bangalore",
-    "restaurantName": "Empire",
-    "zipCode": "560001"
+    "restaurantName": "Pasta Street",
+    "zipCode": "560038",
+    "restoLocationId": 101
   },
   {
-    "id": 102,
+    "id": 2,
     "latitude": 28.6139391,
     "longitude": 77.2090212,
-    "address": "AShok Nagar",
+    "address": "Ali askar road, Cubbon Park",
     "city": "Bangalore",
-    "restaurantName": "Swati",
-    "zipCode": "110001"
+    "restaurantName": "Cafe Noir",
+    "zipCode": "560001",
+    "restoLocationId": 102
   },
   {
-    "id": 103,
+    "id": 3,
     "latitude": 19.076090,
     "longitude": 72.877426,
-    "address": "Ali Askar Road",
+    "address": "BTM Water Tank",
     "city": "Bangalore",
-    "restaurantName": "Samrudhi",
-    "zipCode": "400001"
+    "restaurantName": "Meghana",
+    "zipCode": "560029",
+    "restoLocationId": 103
   }
 ]

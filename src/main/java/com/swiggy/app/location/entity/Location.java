@@ -24,4 +24,7 @@ public class Location {
     private String city;
     private String restaurantName;
     private String zipCode;
+
+    private Long restoLocationId;
+
 }
